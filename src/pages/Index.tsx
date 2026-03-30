@@ -1,16 +1,64 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState, useEffect } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { getProfile } from "@/lib/supabase-helpers";
+import Navbar from "@/components/Navbar";
+import HeroSection from "@/components/HeroSection";
+import ServicesSection from "@/components/ServicesSection";
+import AboutSection from "@/components/AboutSection";
+import Footer from "@/components/Footer";
+import AuthModal from "@/components/AuthModal";
+import BookingModal from "@/components/BookingModal";
+import MyBookings from "@/components/MyBookings";
+import BarberDashboard from "@/components/BarberDashboard";
 
-// IMPORTANT: Fully REPLACE this with your own code
-const PlaceholderIndex = () => {
-  // PLACEHOLDER: Replace this entire return statement with the user's app.
-  // The inline background color is intentionally not part of the design system.
+export default function Index() {
+  const { user, signIn, signUp, signOut } = useAuth();
+  const [authOpen, setAuthOpen] = useState(false);
+  const [bookOpen, setBookOpen] = useState(false);
+  const [myBookingsOpen, setMyBookingsOpen] = useState(false);
+  const [barberOpen, setBarberOpen] = useState(false);
+  const [isBarber, setIsBarber] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      getProfile(user.id).then((p) => setIsBarber(p?.is_barber ?? false)).catch(() => {});
+    } else {
+      setIsBarber(false);
+    }
+  }, [user]);
+
+  const handleBookClick = () => {
+    if (!user) {
+      setAuthOpen(true);
+    } else {
+      setBookOpen(true);
+    }
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#fcfbf8' }}>
-      <img data-lovable-blank-page-placeholder="REMOVE_THIS" src="/placeholder.svg" alt="Your app will live here!" />
+    <div className="min-h-screen bg-background">
+      <Navbar
+        user={user}
+        onSignOut={signOut}
+        onAuthClick={() => setAuthOpen(true)}
+        onBookClick={handleBookClick}
+        onMyBookingsClick={() => setMyBookingsOpen(true)}
+        onBarberClick={() => setBarberOpen(true)}
+        isBarber={isBarber}
+      />
+      <HeroSection onBookClick={handleBookClick} />
+      <ServicesSection />
+      <AboutSection />
+      <Footer />
+
+      <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} onSignIn={signIn} onSignUp={signUp} />
+      {user && (
+        <>
+          <BookingModal open={bookOpen} onClose={() => setBookOpen(false)} userId={user.id} />
+          <MyBookings open={myBookingsOpen} onClose={() => setMyBookingsOpen(false)} userId={user.id} />
+          {isBarber && <BarberDashboard open={barberOpen} onClose={() => setBarberOpen(false)} />}
+        </>
+      )}
     </div>
   );
-};
-
-const Index = PlaceholderIndex;
-
-export default Index;
+}
