@@ -6,10 +6,15 @@ export default function Footer() {
       <div className="container mx-auto max-w-4xl text-center">
         <div className="flex items-center justify-center gap-2 mb-4">
           <Scissors className="h-5 w-5 text-primary" />
-          <span className="font-heading text-lg text-foreground">Alexandria Cuts</span>
+          <span className="font-heading text-lg text-foreground">Karl Salon</span>
+        </div>
+        <div className="flex justify-center gap-4 mb-4">
+          <a href="https://www.instagram.com/kral.saloon/" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors text-sm">Instagram</a>
+          <a href="https://www.facebook.com/KRALSALON1" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors text-sm">Facebook</a>
+          <a href="tel:+201030355625" className="text-muted-foreground hover:text-primary transition-colors text-sm">01030355625</a>
         </div>
         <p className="text-muted-foreground text-sm">
-          Premium barbershop in Alexandria, Egypt. © {new Date().getFullYear()}
+          Karl Salon — Alexandria, Egypt. © {new Date().getFullYear()}
         </p>
       </div>
     </footer>

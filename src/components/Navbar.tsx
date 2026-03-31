@@ -20,7 +20,7 @@ export default function Navbar({ user, onSignOut, onAuthClick, onBookClick, onMy
       <div className="container mx-auto flex items-center justify-between h-16 px-4">
         <div className="flex items-center gap-2">
           <Scissors className="h-6 w-6 text-primary" />
-          <span className="font-heading text-xl text-foreground">Alexandria Cuts</span>
+          <span className="font-heading text-xl text-foreground">Karl Salon</span>
         </div>
 
         {/* Desktop */}
