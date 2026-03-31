@@ -14,6 +14,7 @@ interface NavbarProps {
 }
 
 export default function Navbar({ user, onSignOut, onAuthClick, onBookClick, onMyBookingsClick, onBarberClick, isBarber }: NavbarProps) {
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
   return (
