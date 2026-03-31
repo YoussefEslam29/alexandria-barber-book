@@ -57,7 +57,7 @@ export default function Navbar({ user, onSignOut, onAuthClick, onBookClick, onMy
             <>
               <button onClick={() => { onMyBookingsClick(); setOpen(false); }} className="block text-muted-foreground hover:text-primary text-sm w-full text-left">My Bookings</button>
               {isBarber && onBarberClick && (
-                <button onClick={() => { onBarberClick(); setOpen(false); }} className="block text-muted-foreground hover:text-primary text-sm w-full text-left">Barber Dashboard</button>
+                <button onClick={() => { navigate("/admin"); setOpen(false); }} className="block text-muted-foreground hover:text-primary text-sm w-full text-left">Admin Dashboard</button>
               )}
               <Button onClick={() => { onBookClick(); setOpen(false); }} size="sm" className="w-full">Book Now</Button>
               <Button variant="ghost" size="sm" onClick={() => { onSignOut(); setOpen(false); }} className="w-full text-muted-foreground">Sign Out</Button>
