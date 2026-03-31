@@ -33,7 +33,7 @@ export default function Navbar({ user, onSignOut, onAuthClick, onBookClick, onMy
             <>
               <button onClick={onMyBookingsClick} className="text-muted-foreground hover:text-primary transition-colors text-sm">My Bookings</button>
               {isBarber && onBarberClick && (
-                <button onClick={onBarberClick} className="text-muted-foreground hover:text-primary transition-colors text-sm">Barber Dashboard</button>
+                <button onClick={() => navigate("/admin")} className="text-muted-foreground hover:text-primary transition-colors text-sm">Admin Dashboard</button>
               )}
               <Button onClick={onBookClick} size="sm">Book Now</Button>
               <Button variant="ghost" size="sm" onClick={onSignOut} className="text-muted-foreground">Sign Out</Button>
