@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Scissors, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -13,6 +14,7 @@ interface NavbarProps {
 }
 
 export default function Navbar({ user, onSignOut, onAuthClick, onBookClick, onMyBookingsClick, onBarberClick, isBarber }: NavbarProps) {
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
   return (
@@ -31,7 +33,7 @@ export default function Navbar({ user, onSignOut, onAuthClick, onBookClick, onMy
             <>
               <button onClick={onMyBookingsClick} className="text-muted-foreground hover:text-primary transition-colors text-sm">My Bookings</button>
               {isBarber && onBarberClick && (
-                <button onClick={onBarberClick} className="text-muted-foreground hover:text-primary transition-colors text-sm">Barber Dashboard</button>
+                <button onClick={() => navigate("/admin")} className="text-muted-foreground hover:text-primary transition-colors text-sm">Admin Dashboard</button>
               )}
               <Button onClick={onBookClick} size="sm">Book Now</Button>
               <Button variant="ghost" size="sm" onClick={onSignOut} className="text-muted-foreground">Sign Out</Button>
@@ -55,7 +57,7 @@ export default function Navbar({ user, onSignOut, onAuthClick, onBookClick, onMy
             <>
               <button onClick={() => { onMyBookingsClick(); setOpen(false); }} className="block text-muted-foreground hover:text-primary text-sm w-full text-left">My Bookings</button>
               {isBarber && onBarberClick && (
-                <button onClick={() => { onBarberClick(); setOpen(false); }} className="block text-muted-foreground hover:text-primary text-sm w-full text-left">Barber Dashboard</button>
+                <button onClick={() => { navigate("/admin"); setOpen(false); }} className="block text-muted-foreground hover:text-primary text-sm w-full text-left">Admin Dashboard</button>
               )}
               <Button onClick={() => { onBookClick(); setOpen(false); }} size="sm" className="w-full">Book Now</Button>
               <Button variant="ghost" size="sm" onClick={() => { onSignOut(); setOpen(false); }} className="w-full text-muted-foreground">Sign Out</Button>
