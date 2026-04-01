@@ -22,8 +22,8 @@ export default function Navbar({ user, onSignOut, onAuthClick, onBookClick, onMy
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
       <div className="container mx-auto flex items-center justify-between h-16 px-4">
         <div className="flex items-center gap-2">
-          <Scissors className="h-6 w-6 text-primary" />
-          <span className="font-heading text-xl text-foreground">Karl Salon</span>
+          <img src={kralLogo} alt="Kral Salon logo" className="h-7 w-7 rounded-full object-cover" />
+          <span className="font-heading text-xl text-foreground">Kral Salon</span>
         </div>
 
         {/* Desktop */}
