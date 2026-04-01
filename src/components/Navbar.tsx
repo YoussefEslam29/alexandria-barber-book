@@ -22,7 +22,7 @@ export default function Navbar({ user, onSignOut, onAuthClick, onBookClick, onMy
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
       <div className="container mx-auto flex items-center justify-between h-16 px-4">
         <div className="flex items-center gap-2">
-          <Scissors className="h-6 w-6 text-primary" />
+          <img src={logo} alt="Karl Salon logo" className="h-10 w-10 rounded-full object-cover" />
           <span className="font-heading text-xl text-foreground">Karl Salon</span>
         </div>
 

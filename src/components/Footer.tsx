@@ -5,7 +5,7 @@ export default function Footer() {
     <footer className="bg-card border-t border-border py-12 px-4">
       <div className="container mx-auto max-w-4xl text-center">
         <div className="flex items-center justify-center gap-2 mb-4">
-          <Scissors className="h-5 w-5 text-primary" />
+          <img src={logo} alt="Karl Salon logo" className="h-8 w-8 rounded-full object-cover" />
           <span className="font-heading text-lg text-foreground">Karl Salon</span>
         </div>
         <div className="flex justify-center gap-4 mb-4">
