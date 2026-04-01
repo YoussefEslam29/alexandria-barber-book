@@ -15,7 +15,7 @@ export default function HeroSection({ onBookClick }: HeroSectionProps) {
       <div className="relative z-10 text-center px-4 max-w-3xl mx-auto animate-fade-in">
         <p className="text-primary font-body text-sm tracking-[0.3em] uppercase mb-4">Alexandria, Egypt</p>
         <h1 className="font-heading text-4xl md:text-6xl lg:text-7xl text-foreground mb-6 leading-tight">
-          Karl <span className="text-primary">Salon</span>
+          Kral <span className="text-primary">Salon</span>
         </h1>
         <p className="text-muted-foreground text-lg md:text-xl mb-8 max-w-xl mx-auto">
           Premium grooming experience in Alexandria. Classic cuts, modern style.

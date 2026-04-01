@@ -14,7 +14,7 @@ export default function Footer() {
           <a href="tel:+201030355625" className="text-muted-foreground hover:text-primary transition-colors text-sm">01030355625</a>
         </div>
         <p className="text-muted-foreground text-sm">
-          Karl Salon — Alexandria, Egypt. © {new Date().getFullYear()}
+          Kral Salon — Alexandria, Egypt. © {new Date().getFullYear()}
         </p>
       </div>
     </footer>
