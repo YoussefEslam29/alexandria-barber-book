@@ -1,4 +1,4 @@
-import { Scissors } from "lucide-react";
+import logo from "@/assets/logo.jpg";
 
 export default function Footer() {
   return (
