@@ -60,6 +60,19 @@ export default function AboutSection() {
             </div>
           </div>
         </div>
+
+        <div className="mt-16 rounded-lg overflow-hidden border border-border">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3412.123!2d29.9194!3d31.2156!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14f5c4f16bfb5f67%3A0x7e3c1e5b0a1b2c3d!2sKral%20Salon!5e0!3m2!1sen!2seg!4v1700000000000"
+            width="100%"
+            height="350"
+            style={{ border: 0 }}
+            allowFullScreen
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            title="Kral Salon location on Google Maps"
+          />
+        </div>
       </div>
     </section>
   );
