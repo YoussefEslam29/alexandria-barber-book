@@ -10,6 +10,7 @@ import AuthModal from "@/components/AuthModal";
 import BookingModal from "@/components/BookingModal";
 import MyBookings from "@/components/MyBookings";
 import BarberDashboard from "@/components/BarberDashboard";
+import WhatsAppButton from "@/components/WhatsAppButton";
 
 export default function Index() {
   const { user, signIn, signUp, signOut } = useAuth();
