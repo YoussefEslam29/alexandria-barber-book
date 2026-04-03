@@ -8,7 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import kralLogo from "@/assets/kral-logo.png";
 import {
   CalendarDays,
   Clock,
@@ -21,6 +23,8 @@ import {
   Search,
   Filter,
   LayoutDashboard,
+  LogIn,
+  LogOut,
 } from "lucide-react";
 
 const statusColors: Record<string, string> = {
@@ -32,8 +36,59 @@ const statusColors: Record<string, string> = {
 
 type StatusFilter = "all" | "pending" | "confirmed" | "completed" | "cancelled";
 
+function AdminLoginForm({ onLogin }: { onLogin: () => void }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    try {
+      const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+      if (signInError) throw signInError;
+      onLogin();
+    } catch (err: any) {
+      setError(err.message || "Login failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-background flex items-center justify-center px-4">
+      <Card className="w-full max-w-md bg-card border-border">
+        <CardHeader className="text-center space-y-3">
+          <img src={kralLogo} alt="Kral Salon" className="h-16 w-16 rounded-full object-cover mx-auto" />
+          <CardTitle className="font-heading text-2xl text-foreground">Admin Dashboard</CardTitle>
+          <p className="text-sm text-muted-foreground">Sign in with your admin credentials</p>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <Label htmlFor="admin-email" className="text-muted-foreground">Email</Label>
+              <Input id="admin-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="bg-muted border-border" />
+            </div>
+            <div>
+              <Label htmlFor="admin-password" className="text-muted-foreground">Password</Label>
+              <Input id="admin-password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required className="bg-muted border-border" />
+            </div>
+            {error && <p className="text-sm text-destructive">{error}</p>}
+            <Button type="submit" className="w-full" disabled={loading}>
+              <LogIn className="h-4 w-4 mr-2" />
+              {loading ? "Signing in..." : "Sign In"}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
 export default function AdminDashboard() {
-  const { user, loading } = useAuth();
+  const { user, loading, signOut } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -42,24 +97,33 @@ export default function AdminDashboard() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [searchQuery, setSearchQuery] = useState("");
 
+  const checkBarberStatus = async (userId: string) => {
+    try {
+      const p = await getProfile(userId);
+      if (p?.is_barber) {
+        setIsBarber(true);
+        setAuthChecked(true);
+      } else {
+        toast({ title: "Access denied", description: "This account does not have admin privileges.", variant: "destructive" });
+        await supabase.auth.signOut();
+        setIsBarber(false);
+        setAuthChecked(false);
+      }
+    } catch {
+      toast({ title: "Error", description: "Could not verify admin status.", variant: "destructive" });
+      await supabase.auth.signOut();
+    }
+  };
+
   useEffect(() => {
+    if (!loading && user) {
+      checkBarberStatus(user.id);
+    }
     if (!loading && !user) {
-      navigate("/");
-      return;
+      setIsBarber(false);
+      setAuthChecked(false);
     }
-    if (user) {
-      getProfile(user.id)
-        .then((p) => {
-          if (!p?.is_barber) {
-            navigate("/");
-            return;
-          }
-          setIsBarber(true);
-          setAuthChecked(true);
-        })
-        .catch(() => navigate("/"));
-    }
-  }, [user, loading, navigate]);
+  }, [user, loading]);
 
   const { data: bookings = [], isLoading } = useQuery({
     queryKey: ["admin-bookings"],
