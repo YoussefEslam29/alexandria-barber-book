@@ -204,7 +204,7 @@ export default function AdminDashboard() {
             <h1 className="text-xl sm:text-2xl font-heading text-foreground">Admin Dashboard</h1>
           </div>
           <Badge variant="outline" className="border-primary text-primary">
-            Karl Salon
+            Kral Salon
           </Badge>
         </div>
       </header>
