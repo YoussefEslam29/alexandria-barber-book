@@ -141,12 +141,16 @@ export default function AdminDashboard() {
     },
   });
 
-  if (loading || !authChecked) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <p className="text-muted-foreground">Loading...</p>
       </div>
     );
+  }
+
+  if (!user || !authChecked || !isBarber) {
+    return <AdminLoginForm onLogin={() => { /* auth state change will trigger useEffect */ }} />;
   }
 
   const totalBookings = bookings.length;
