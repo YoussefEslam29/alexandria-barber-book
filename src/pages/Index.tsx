@@ -10,6 +10,7 @@ import AuthModal from "@/components/AuthModal";
 import BookingModal from "@/components/BookingModal";
 import MyBookings from "@/components/MyBookings";
 import BarberDashboard from "@/components/BarberDashboard";
+import WhatsAppButton from "@/components/WhatsAppButton";
 
 export default function Index() {
   const { user, signIn, signUp, signOut } = useAuth();
@@ -50,6 +51,7 @@ export default function Index() {
       <ServicesSection />
       <AboutSection />
       <Footer />
+      <WhatsAppButton />
 
       <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} onSignIn={signIn} onSignUp={signUp} />
       {user && (
