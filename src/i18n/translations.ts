@@ -37,6 +37,7 @@ export const translations = {
   },
   contact: { en: "Contact", ar: "اتصل بنا" },
   followUs: { en: "Follow Us", ar: "تابعنا" },
+  openInGoogleMaps: { en: "Open in Google Maps", ar: "الفتح في خرائط جوجل" },
 
   // Auth
   createAccount: { en: "Create Account", ar: "إنشاء حساب" },

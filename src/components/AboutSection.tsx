@@ -49,17 +49,31 @@ export default function AboutSection() {
           </div>
         </div>
 
-        <div className="mt-16 rounded-lg overflow-hidden border border-border">
-          <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3412.123!2d29.9194!3d31.2156!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x14f5c4f16bfb5f67%3A0x7e3c1e5b0a1b2c3d!2sKral%20Salon!5e0!3m2!1sen!2seg!4v1700000000000"
-            width="100%"
-            height="350"
-            style={{ border: 0 }}
-            allowFullScreen
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            title="Kral Salon location on Google Maps"
-          />
+        <div className="mt-16 flex flex-col gap-6">
+          <div className="w-full rounded-lg overflow-hidden border border-border relative z-10 bg-card">
+            <iframe
+              src="https://maps.google.com/maps?q=31.2167741,29.957407&t=&z=16&ie=UTF8&iwloc=&output=embed"
+              width="100%"
+              height="350"
+              style={{ border: 0 }}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title="Kral Salon location on Google Maps"
+              className="w-full grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all duration-500"
+            />
+          </div>
+          <div className="flex justify-center">
+            <a
+              href="https://www.google.com/maps/search/?api=1&query=31.2167741,29.957407&query_place_id=ChIJOYNFEyDF9RQRoaQP1BFD9I4"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 px-8 py-3 rounded-full transition-all duration-300 font-medium tracking-wide hover:shadow-[0_0_15px] hover:shadow-primary/30 group"
+            >
+              <MapPin className="w-5 h-5 group-hover:scale-110 transition-transform" />
+              {t("openInGoogleMaps")}
+            </a>
+          </div>
         </div>
       </div>
     </section>
