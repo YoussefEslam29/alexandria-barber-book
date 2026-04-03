@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { getUserBookings, updateBookingStatus } from "@/lib/supabase-helpers";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/i18n/LanguageContext";
 import { CalendarDays, Clock } from "lucide-react";
 
 interface MyBookingsProps {
@@ -22,6 +23,7 @@ const statusColors: Record<string, string> = {
 export default function MyBookings({ open, onClose, userId }: MyBookingsProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { t } = useLanguage();
 
   const { data: bookings, isLoading } = useQuery({
     queryKey: ["bookings", userId],
@@ -33,7 +35,7 @@ export default function MyBookings({ open, onClose, userId }: MyBookingsProps) {
     mutationFn: (bookingId: string) => updateBookingStatus(bookingId, "cancelled"),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["bookings"] });
-      toast({ title: "Booking cancelled" });
+      toast({ title: t("bookingCancelled") });
     },
   });
 
@@ -41,12 +43,12 @@ export default function MyBookings({ open, onClose, userId }: MyBookingsProps) {
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="bg-card border-border max-w-lg max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="font-heading text-2xl text-foreground">My Bookings</DialogTitle>
+          <DialogTitle className="font-heading text-2xl text-foreground">{t("myBookings")}</DialogTitle>
         </DialogHeader>
         {isLoading ? (
-          <p className="text-muted-foreground text-center py-8">Loading...</p>
+          <p className="text-muted-foreground text-center py-8">{t("loading")}</p>
         ) : !bookings?.length ? (
-          <p className="text-muted-foreground text-center py-8">No bookings yet.</p>
+          <p className="text-muted-foreground text-center py-8">{t("noBookings")}</p>
         ) : (
           <div className="space-y-4">
             {bookings.map((b: any) => (
@@ -62,7 +64,7 @@ export default function MyBookings({ open, onClose, userId }: MyBookingsProps) {
                 <p className="text-primary text-sm">{b.services?.price} EGP</p>
                 {b.status === "pending" && (
                   <Button variant="ghost" size="sm" className="mt-2 text-destructive" onClick={() => cancelMutation.mutate(b.id)}>
-                    Cancel
+                    {t("cancel")}
                   </Button>
                 )}
               </div>
