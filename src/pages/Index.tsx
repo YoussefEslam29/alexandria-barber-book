@@ -51,6 +51,7 @@ export default function Index() {
       <ServicesSection />
       <AboutSection />
       <Footer />
+      <WhatsAppButton />
 
       <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} onSignIn={signIn} onSignUp={signUp} />
       {user && (
