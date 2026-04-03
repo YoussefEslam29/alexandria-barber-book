@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { useLanguage } from "@/i18n/LanguageContext";
 import { getServices, createBooking } from "@/lib/supabase-helpers";
 
 interface BookingModalProps {
@@ -29,6 +30,7 @@ export default function BookingModal({ open, onClose, userId }: BookingModalProp
   const [notes, setNotes] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { lang, t } = useLanguage();
 
   const { data: services } = useQuery({
     queryKey: ["services"],
@@ -38,7 +40,7 @@ export default function BookingModal({ open, onClose, userId }: BookingModalProp
   const mutation = useMutation({
     mutationFn: createBooking,
     onSuccess: () => {
-      toast({ title: "Booked!", description: "Your appointment has been confirmed." });
+      toast({ title: t("booked"), description: t("appointmentConfirmed") });
       queryClient.invalidateQueries({ queryKey: ["bookings"] });
       onClose();
       setServiceId("");
@@ -47,7 +49,7 @@ export default function BookingModal({ open, onClose, userId }: BookingModalProp
       setNotes("");
     },
     onError: (err: any) => {
-      toast({ title: "Booking failed", description: err.message, variant: "destructive" });
+      toast({ title: t("bookingFailed"), description: err.message, variant: "destructive" });
     },
   });
 
@@ -68,47 +70,47 @@ export default function BookingModal({ open, onClose, userId }: BookingModalProp
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="bg-card border-border max-w-md">
         <DialogHeader>
-          <DialogTitle className="font-heading text-2xl text-foreground">Book Appointment</DialogTitle>
+          <DialogTitle className="font-heading text-2xl text-foreground">{t("bookAppointmentTitle")}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label className="text-muted-foreground">Service</Label>
+            <Label className="text-muted-foreground">{t("service")}</Label>
             <Select value={serviceId} onValueChange={setServiceId} required>
               <SelectTrigger className="bg-muted border-border">
-                <SelectValue placeholder="Select a service" />
+                <SelectValue placeholder={t("selectService")} />
               </SelectTrigger>
               <SelectContent className="bg-card border-border">
                 {services?.map((s) => (
                   <SelectItem key={s.id} value={s.id}>
-                    {s.name} — {s.price} EGP
+                    {lang === "ar" && s.name_ar ? s.name_ar : s.name} — {s.price} EGP
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
           <div>
-            <Label className="text-muted-foreground">Date</Label>
+            <Label className="text-muted-foreground">{t("date")}</Label>
             <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} min={today} required className="bg-muted border-border" />
           </div>
           <div>
-            <Label className="text-muted-foreground">Time</Label>
+            <Label className="text-muted-foreground">{t("time")}</Label>
             <Select value={time} onValueChange={setTime} required>
               <SelectTrigger className="bg-muted border-border">
-                <SelectValue placeholder="Select a time" />
+                <SelectValue placeholder={t("selectTime")} />
               </SelectTrigger>
               <SelectContent className="bg-card border-border">
-                {TIME_SLOTS.map((t) => (
-                  <SelectItem key={t} value={t}>{t}</SelectItem>
+                {TIME_SLOTS.map((slot) => (
+                  <SelectItem key={slot} value={slot}>{slot}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
           <div>
-            <Label className="text-muted-foreground">Notes (optional)</Label>
-            <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Any special requests..." className="bg-muted border-border" />
+            <Label className="text-muted-foreground">{t("notesOptional")}</Label>
+            <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder={t("notesPlaceholder")} className="bg-muted border-border" />
           </div>
           <Button type="submit" className="w-full" disabled={mutation.isPending || !serviceId || !date || !time}>
-            {mutation.isPending ? "Booking..." : "Confirm Booking"}
+            {mutation.isPending ? t("booking") : t("confirmBooking")}
           </Button>
         </form>
       </DialogContent>

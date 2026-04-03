@@ -1,6 +1,9 @@
+import { useLanguage } from "@/i18n/LanguageContext";
 import kralLogo from "@/assets/kral-logo.png";
 
 export default function Footer() {
+  const { t } = useLanguage();
+
   return (
     <footer className="bg-card border-t border-border py-12 px-4">
       <div className="container mx-auto max-w-4xl text-center">
@@ -14,7 +17,7 @@ export default function Footer() {
           <a href="tel:+201030355625" className="text-muted-foreground hover:text-primary transition-colors text-sm">01030355625</a>
         </div>
         <p className="text-muted-foreground text-sm">
-          Kral Salon — Alexandria, Egypt. © {new Date().getFullYear()}
+          {t("footerText")} © {new Date().getFullYear()}
         </p>
       </div>
     </footer>
