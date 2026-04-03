@@ -5,7 +5,7 @@ export default function AboutSection() {
     <section id="about" className="py-24 px-4 bg-card">
       <div className="container mx-auto max-w-4xl">
         <p className="text-primary text-sm tracking-[0.3em] uppercase text-center mb-3">About Us</p>
-        <h2 className="font-heading text-3xl md:text-4xl text-foreground text-center mb-12">Karl Salon</h2>
+        <h2 className="font-heading text-3xl md:text-4xl text-foreground text-center mb-12"><h2 className="font-heading text-3xl md:text-4xl text-foreground text-center mb-12">Kral Salon</h2></h2>
 
         <p className="text-muted-foreground text-center max-w-2xl mx-auto mb-16 text-lg">
           Located in Alexandria, we bring together traditional barbering craftsmanship
