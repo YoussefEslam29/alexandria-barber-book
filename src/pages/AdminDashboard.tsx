@@ -203,9 +203,15 @@ export default function AdminDashboard() {
             <LayoutDashboard className="h-6 w-6 text-primary" />
             <h1 className="text-xl sm:text-2xl font-heading text-foreground">Admin Dashboard</h1>
           </div>
-          <Badge variant="outline" className="border-primary text-primary">
-            Kral Salon
-          </Badge>
+          <div className="flex items-center gap-3">
+            <Badge variant="outline" className="border-primary text-primary">
+              Kral Salon
+            </Badge>
+            <Button variant="ghost" size="sm" onClick={() => signOut()} className="text-muted-foreground">
+              <LogOut className="h-4 w-4 mr-1" />
+              Sign Out
+            </Button>
+          </div>
         </div>
       </header>
 
