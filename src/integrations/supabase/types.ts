@@ -60,29 +60,41 @@ export type Database = {
       }
       profiles: {
         Row: {
+          age: number | null
+          email: string | null
           created_at: string
           full_name: string | null
           id: string
           is_barber: boolean
           phone: string | null
+          phone_number: string | null
+          role: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          age?: number | null
+          email?: string | null
           created_at?: string
           full_name?: string | null
           id?: string
           is_barber?: boolean
           phone?: string | null
+          phone_number?: string | null
+          role?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          age?: number | null
+          email?: string | null
           created_at?: string
           full_name?: string | null
           id?: string
           is_barber?: boolean
           phone?: string | null
+          phone_number?: string | null
+          role?: string | null
           updated_at?: string
           user_id?: string
         }
