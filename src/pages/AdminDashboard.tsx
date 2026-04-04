@@ -2,8 +2,10 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
-import { getProfile, getAllBookings, updateBookingStatus } from "@/lib/supabase-helpers";
+import { getProfile, getAllBookings, updateBookingStatus, getAllProfiles } from "@/lib/supabase-helpers";
 import { supabase } from "@/integrations/supabase/client";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -96,6 +98,7 @@ export default function AdminDashboard() {
   const [authChecked, setAuthChecked] = useState(false);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [usersSearch, setUsersSearch] = useState("");
 
   const checkBarberStatus = async (userId: string) => {
     try {
@@ -130,6 +133,12 @@ export default function AdminDashboard() {
     queryFn: getAllBookings,
     enabled: isBarber,
     refetchInterval: 30000,
+  });
+
+  const { data: profiles = [], isLoading: isLoadingProfiles } = useQuery({
+    queryKey: ["admin-profiles"],
+    queryFn: getAllProfiles,
+    enabled: isBarber,
   });
 
   const statusMutation = useMutation({
@@ -173,6 +182,13 @@ export default function AdminDashboard() {
       (b.services?.name || "").toLowerCase().includes(searchQuery.toLowerCase());
     return matchStatus && matchSearch;
   });
+
+  const filteredProfiles = profiles.filter((p: any) =>
+    !usersSearch ||
+    (p.full_name || "").toLowerCase().includes(usersSearch.toLowerCase()) ||
+    (p.email || "").toLowerCase().includes(usersSearch.toLowerCase()) ||
+    (p.phone_number || "").includes(usersSearch)
+  );
 
   const stats = [
     { label: "Total Bookings", value: totalBookings, icon: CalendarDays, color: "text-primary" },
@@ -231,114 +247,176 @@ export default function AdminDashboard() {
           ))}
         </div>
 
-        {/* Filters */}
-        <div className="flex flex-col sm:flex-row gap-3">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search by client or service..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 bg-card border-border"
-            />
-          </div>
-          <div className="flex gap-2 flex-wrap">
-            {filters.map((f) => (
-              <Button
-                key={f.value}
-                size="sm"
-                variant={statusFilter === f.value ? "default" : "outline"}
-                onClick={() => setStatusFilter(f.value)}
-              >
-                {f.label}
-              </Button>
-            ))}
-          </div>
-        </div>
+        <Tabs defaultValue="bookings" className="w-full">
+          <TabsList className="mb-6 bg-card border border-border">
+            <TabsTrigger value="bookings" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary">Bookings</TabsTrigger>
+            <TabsTrigger value="users" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary">Registered Users</TabsTrigger>
+          </TabsList>
 
-        {/* Bookings List */}
-        {isLoading ? (
-          <p className="text-muted-foreground text-center py-12">Loading bookings...</p>
-        ) : !filtered.length ? (
-          <Card className="bg-card border-border">
-            <CardContent className="py-12 text-center">
-              <p className="text-muted-foreground">No bookings found.</p>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="space-y-3">
-            {filtered.map((b: any) => (
-              <Card key={b.id} className="bg-card border-border hover:border-primary/30 transition-colors">
-                <CardContent className="p-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-heading text-foreground font-semibold truncate">
-                          {b.services?.name || "Unknown Service"}
-                        </h3>
-                        <Badge className={statusColors[b.status] || ""} variant="outline">
-                          {b.status}
-                        </Badge>
-                      </div>
-                      <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-                        <span className="flex items-center gap-1">
-                          <User className="h-3 w-3" />
-                          {b.profiles?.full_name || "Unknown"}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <CalendarDays className="h-3 w-3" />
-                          {b.booking_date}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          {b.booking_time}
-                        </span>
-                        <span className="text-primary font-medium">
-                          {b.services?.price} EGP
-                        </span>
-                      </div>
-                      {b.notes && (
-                        <p className="text-xs text-muted-foreground mt-1">Notes: {b.notes}</p>
-                      )}
-                    </div>
-                    <div className="flex gap-2 shrink-0">
-                      {b.status === "pending" && (
-                        <Button
-                          size="sm"
-                          onClick={() => statusMutation.mutate({ id: b.id, status: "confirmed" })}
-                          disabled={statusMutation.isPending}
-                        >
-                          Confirm
-                        </Button>
-                      )}
-                      {(b.status === "pending" || b.status === "confirmed") && (
-                        <Button
-                          size="sm"
-                          variant="secondary"
-                          onClick={() => statusMutation.mutate({ id: b.id, status: "completed" })}
-                          disabled={statusMutation.isPending}
-                        >
-                          Complete
-                        </Button>
-                      )}
-                      {b.status !== "cancelled" && b.status !== "completed" && (
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          className="text-destructive hover:text-destructive"
-                          onClick={() => statusMutation.mutate({ id: b.id, status: "cancelled" })}
-                          disabled={statusMutation.isPending}
-                        >
-                          Cancel
-                        </Button>
-                      )}
-                    </div>
-                  </div>
+          <TabsContent value="bookings" className="space-y-6">
+            {/* Filters */}
+            <div className="flex flex-col sm:flex-row gap-3">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search by client or service..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9 bg-card border-border"
+                />
+              </div>
+              <div className="flex gap-2 flex-wrap">
+                {filters.map((f) => (
+                  <Button
+                    key={f.value}
+                    size="sm"
+                    variant={statusFilter === f.value ? "default" : "outline"}
+                    onClick={() => setStatusFilter(f.value)}
+                  >
+                    {f.label}
+                  </Button>
+                ))}
+              </div>
+            </div>
+
+            {/* Bookings List */}
+            {isLoading ? (
+              <p className="text-muted-foreground text-center py-12">Loading bookings...</p>
+            ) : !filtered.length ? (
+              <Card className="bg-card border-border">
+                <CardContent className="py-12 text-center">
+                  <p className="text-muted-foreground">No bookings found.</p>
                 </CardContent>
               </Card>
-            ))}
-          </div>
-        )}
+            ) : (
+              <div className="space-y-3">
+                {filtered.map((b: any) => (
+                  <Card key={b.id} className="bg-card border-border hover:border-primary/30 transition-colors">
+                    <CardContent className="p-4">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="font-heading text-foreground font-semibold truncate">
+                              {b.services?.name || "Unknown Service"}
+                            </h3>
+                            <Badge className={statusColors[b.status] || ""} variant="outline">
+                              {b.status}
+                            </Badge>
+                          </div>
+                          <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+                            <span className="flex items-center gap-1">
+                              <User className="h-3 w-3" />
+                              {b.profiles?.full_name || "Unknown"}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <CalendarDays className="h-3 w-3" />
+                              {b.booking_date}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Clock className="h-3 w-3" />
+                              {b.booking_time}
+                            </span>
+                            <span className="text-primary font-medium">
+                              {b.services?.price} EGP
+                            </span>
+                          </div>
+                          {b.notes && (
+                            <p className="text-xs text-muted-foreground mt-1">Notes: {b.notes}</p>
+                          )}
+                        </div>
+                        <div className="flex gap-2 shrink-0">
+                          {b.status === "pending" && (
+                            <Button
+                              size="sm"
+                              onClick={() => statusMutation.mutate({ id: b.id, status: "confirmed" })}
+                              disabled={statusMutation.isPending}
+                            >
+                              Confirm
+                            </Button>
+                          )}
+                          {(b.status === "pending" || b.status === "confirmed") && (
+                            <Button
+                              size="sm"
+                              variant="secondary"
+                              onClick={() => statusMutation.mutate({ id: b.id, status: "completed" })}
+                              disabled={statusMutation.isPending}
+                            >
+                              Complete
+                            </Button>
+                          )}
+                          {b.status !== "cancelled" && b.status !== "completed" && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="text-destructive hover:text-destructive"
+                              onClick={() => statusMutation.mutate({ id: b.id, status: "cancelled" })}
+                              disabled={statusMutation.isPending}
+                            >
+                              Cancel
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="users" className="space-y-6">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search users by name, email, or phone..."
+                value={usersSearch}
+                onChange={(e) => setUsersSearch(e.target.value)}
+                className="pl-9 bg-card border-border"
+              />
+            </div>
+            
+            <Card className="bg-card border-border">
+              <CardContent className="p-0 overflow-x-auto">
+                <Table>
+                  <TableHeader className="bg-muted/50">
+                    <TableRow className="border-border hover:bg-transparent">
+                      <TableHead className="font-heading text-primary">Name</TableHead>
+                      <TableHead className="font-heading text-primary">Email</TableHead>
+                      <TableHead className="font-heading text-primary">Phone</TableHead>
+                      <TableHead className="font-heading text-primary w-[80px]">Age</TableHead>
+                      <TableHead className="font-heading text-primary text-right">Role</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {isLoadingProfiles ? (
+                      <TableRow>
+                        <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">Loading users...</TableCell>
+                      </TableRow>
+                    ) : filteredProfiles.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">No users found.</TableCell>
+                      </TableRow>
+                    ) : (
+                      filteredProfiles.map((userProfile: any) => (
+                        <TableRow key={userProfile.id} className="border-border/50 hover:bg-primary/5 transition-colors">
+                          <TableCell className="font-medium text-foreground">{userProfile.full_name || "-"}</TableCell>
+                          <TableCell className="text-muted-foreground">{userProfile.email || "-"}</TableCell>
+                          <TableCell className="text-muted-foreground">{userProfile.phone_number || "-"}</TableCell>
+                          <TableCell className="text-muted-foreground">{userProfile.age || "-"}</TableCell>
+                          <TableCell className="text-right">
+                            <Badge variant="outline" className={userProfile.is_barber ? "border-primary text-primary bg-primary/10" : "border-border text-muted-foreground"}>
+                              {userProfile.is_barber ? "Admin" : (userProfile.role || "User")}
+                            </Badge>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </main>
     </div>
   );
