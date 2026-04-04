@@ -47,3 +47,9 @@ export async function getProfile(userId: string) {
   if (error) throw error;
   return data;
 }
+
+export async function getAllProfiles() {
+  const { data, error } = await supabase.from("profiles").select("*").order("created_at", { ascending: false });
+  if (error) throw error;
+  return data;
+}
