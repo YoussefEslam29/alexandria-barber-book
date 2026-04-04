@@ -10,7 +10,7 @@ interface AuthModalProps {
   open: boolean;
   onClose: () => void;
   onSignIn: (email: string, password: string) => Promise<void>;
-  onSignUp: (email: string, password: string, fullName: string) => Promise<void>;
+  onSignUp: (email: string, password: string, fullName: string, phoneNumber: string, age: number) => Promise<void>;
 }
 
 export default function AuthModal({ open, onClose, onSignIn, onSignUp }: AuthModalProps) {
@@ -18,6 +18,8 @@ export default function AuthModal({ open, onClose, onSignIn, onSignUp }: AuthMod
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [age, setAge] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const { t } = useLanguage();
@@ -27,8 +29,8 @@ export default function AuthModal({ open, onClose, onSignIn, onSignUp }: AuthMod
     setLoading(true);
     try {
       if (isSignUp) {
-        await onSignUp(email, password, fullName);
-        toast({ title: t("accountCreated"), description: t("checkEmail") });
+        await onSignUp(email, password, fullName, phoneNumber, parseInt(age, 10));
+        toast({ title: t("accountCreated") || "Account created! Welcome." });
       } else {
         await onSignIn(email, password);
         toast({ title: t("welcomeBack") });
@@ -37,6 +39,8 @@ export default function AuthModal({ open, onClose, onSignIn, onSignUp }: AuthMod
       setEmail("");
       setPassword("");
       setFullName("");
+      setPhoneNumber("");
+      setAge("");
     } catch (err: any) {
       toast({ title: t("error"), description: err.message, variant: "destructive" });
     } finally {
@@ -54,10 +58,20 @@ export default function AuthModal({ open, onClose, onSignIn, onSignUp }: AuthMod
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           {isSignUp && (
-            <div>
-              <Label htmlFor="fullName" className="text-muted-foreground">{t("fullName")}</Label>
-              <Input id="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)} required className="bg-muted border-border" />
-            </div>
+            <>
+              <div>
+                <Label htmlFor="fullName" className="text-muted-foreground">{t("fullName")}</Label>
+                <Input id="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)} required className="bg-muted border-border" />
+              </div>
+              <div>
+                <Label htmlFor="phoneNumber" className="text-muted-foreground">Phone Number</Label>
+                <Input id="phoneNumber" type="tel" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} required className="bg-muted border-border" />
+              </div>
+              <div>
+                <Label htmlFor="age" className="text-muted-foreground">Age</Label>
+                <Input id="age" type="number" min="1" value={age} onChange={(e) => setAge(e.target.value)} required className="bg-muted border-border" />
+              </div>
+            </>
           )}
           <div>
             <Label htmlFor="email" className="text-muted-foreground">{t("email")}</Label>
