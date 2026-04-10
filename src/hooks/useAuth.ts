@@ -25,16 +25,58 @@ export function useAuth() {
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) throw error;
+    if (error) {
+      // Tag specific error types so the UI can show contextual messages
+      const isRateLimit =
+        error.status === 429 ||
+        error.message?.toLowerCase().includes("rate limit") ||
+        error.message?.toLowerCase().includes("too many requests");
+
+      const isEmailNotConfirmed =
+        error.message?.toLowerCase().includes("email not confirmed");
+
+      const enriched: any = new Error(error.message);
+      enriched.code = isRateLimit
+        ? "rate_limit"
+        : isEmailNotConfirmed
+          ? "email_not_confirmed"
+          : "auth_error";
+      throw enriched;
+    }
   };
 
   const signUp = async (email: string, password: string, fullName: string, phoneNumber: string, age: number) => {
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { full_name: fullName, phone_number: phoneNumber, age: age } },
+      options: {
+        data: { full_name: fullName, phone_number: phoneNumber, age },
+      },
     });
-    if (error) throw error;
+
+    if (error) {
+      const isRateLimit =
+        error.status === 429 ||
+        error.message?.toLowerCase().includes("rate limit") ||
+        error.message?.toLowerCase().includes("too many requests") ||
+        error.message?.toLowerCase().includes("limit exceeded");
+
+      const enriched: any = new Error(error.message);
+      enriched.code = isRateLimit ? "rate_limit" : "auth_error";
+      throw enriched;
+    }
+
+    // If Supabase returned a session (email confirmation disabled), set it
+    // immediately so the user is logged in right away.
+    if (data?.session) {
+      setSession(data.session);
+      setUser(data.session.user);
+    } else if (data?.user) {
+      // Even without a session, store the user so the UI can react
+      setUser(data.user);
+    }
+
+    return data;
   };
 
   const signOut = async () => {
