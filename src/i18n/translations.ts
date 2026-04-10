@@ -52,6 +52,13 @@ export const translations = {
   checkEmail: { en: "Please check your email to verify.", ar: "يرجى التحقق من بريدك الإلكتروني." },
   welcomeBack: { en: "Welcome back!", ar: "مرحباً بعودتك!" },
   error: { en: "Error", ar: "خطأ" },
+  rateLimitTitle: { en: "Too many attempts", ar: "محاولات كثيرة جداً" },
+  rateLimitDesc: { en: "Please wait a minute before trying again.", ar: "يرجى الانتظار دقيقة قبل المحاولة مرة أخرى." },
+  emailNotConfirmedTitle: { en: "Email not confirmed", ar: "لم يتم تأكيد البريد الإلكتروني" },
+  emailNotConfirmedDesc: {
+    en: "Your email has not been confirmed. Ask the site admin to disable 'Confirm Email' in the Supabase Dashboard (Authentication → Providers → Email), or check your inbox for a verification link.",
+    ar: "لم يتم تأكيد بريدك الإلكتروني. اطلب من مسؤول الموقع تعطيل 'تأكيد البريد الإلكتروني' في لوحة تحكم Supabase (المصادقة ← الموفرين ← البريد الإلكتروني)، أو تحقق من بريدك الوارد للحصول على رابط التحقق.",
+  },
 
   // Booking
   bookAppointmentTitle: { en: "Book Appointment", ar: "حجز موعد" },
