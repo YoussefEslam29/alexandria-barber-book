@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
-import { getProfile, getAllBookings, updateBookingStatus, getAllProfiles } from "@/lib/supabase-helpers";
+import { getProfile, getAllBookings, updateBookingStatus, getAllCustomers } from "@/lib/supabase-helpers";
 import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -17,16 +17,18 @@ import {
   CalendarDays,
   Clock,
   User,
+  Phone,
+  Mail,
+  Scissors,
   DollarSign,
   TrendingUp,
   CheckCircle,
   XCircle,
   ArrowLeft,
   Search,
-  Filter,
   LayoutDashboard,
-  LogIn,
   LogOut,
+  Gift,
 } from "lucide-react";
 
 const statusColors: Record<string, string> = {
@@ -97,7 +99,7 @@ export default function AdminDashboard() {
   const [authChecked, setAuthChecked] = useState(false);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [searchQuery, setSearchQuery] = useState("");
-  const [usersSearch, setUsersSearch] = useState("");
+  const [customersSearch, setCustomersSearch] = useState("");
 
   const checkBarberStatus = async (userId: string) => {
     try {
@@ -134,9 +136,9 @@ export default function AdminDashboard() {
     refetchInterval: 30000,
   });
 
-  const { data: profiles = [], isLoading: isLoadingProfiles } = useQuery({
-    queryKey: ["admin-profiles"],
-    queryFn: getAllProfiles,
+  const { data: customers = [], isLoading: isLoadingCustomers } = useQuery({
+    queryKey: ["admin-customers"],
+    queryFn: getAllCustomers,
     enabled: isBarber,
   });
 
@@ -173,20 +175,24 @@ export default function AdminDashboard() {
   const todayStr = new Date().toISOString().split("T")[0];
   const todayBookings = bookings.filter((b: any) => b.booking_date === todayStr).length;
 
+  const loyaltyReady = customers.filter((c: any) => c.visit_count >= 5).length;
+
   const filtered = bookings.filter((b: any) => {
     const matchStatus = statusFilter === "all" || b.status === statusFilter;
     const matchSearch =
       !searchQuery ||
-      (b.profiles?.full_name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+      ((b as any).customer_name || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
+      ((b as any).customer_phone || "").includes(searchQuery) ||
+      ((b as any).barber || "").toLowerCase().includes(searchQuery.toLowerCase()) ||
       (b.services?.name || "").toLowerCase().includes(searchQuery.toLowerCase());
     return matchStatus && matchSearch;
   });
 
-  const filteredProfiles = profiles.filter((p: any) =>
-    !usersSearch ||
-    (p.full_name || "").toLowerCase().includes(usersSearch.toLowerCase()) ||
-    (p.email || "").toLowerCase().includes(usersSearch.toLowerCase()) ||
-    (p.phone_number || "").includes(usersSearch)
+  const filteredCustomers = customers.filter((c: any) =>
+    !customersSearch ||
+    (c.full_name || "").toLowerCase().includes(customersSearch.toLowerCase()) ||
+    (c.phone || "").includes(customersSearch) ||
+    (c.email || "").toLowerCase().includes(customersSearch.toLowerCase())
   );
 
   const stats = [
@@ -194,8 +200,8 @@ export default function AdminDashboard() {
     { label: "Today", value: todayBookings, icon: TrendingUp, color: "text-green-400" },
     { label: "Pending", value: pendingCount, icon: Clock, color: "text-yellow-400" },
     { label: "Completed", value: completedCount, icon: CheckCircle, color: "text-blue-400" },
-    { label: "Cancelled", value: cancelledCount, icon: XCircle, color: "text-red-400" },
     { label: "Revenue", value: `${totalRevenue} EGP`, icon: DollarSign, color: "text-primary" },
+    { label: "Loyalty (5+ visits)", value: loyaltyReady, icon: Gift, color: "text-pink-400" },
   ];
 
   const filters: { label: string; value: StatusFilter }[] = [
@@ -249,16 +255,16 @@ export default function AdminDashboard() {
         <Tabs defaultValue="bookings" className="w-full">
           <TabsList className="mb-6 bg-card border border-border">
             <TabsTrigger value="bookings" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary">Bookings</TabsTrigger>
-            <TabsTrigger value="users" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary">Registered Users</TabsTrigger>
+            <TabsTrigger value="customers" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary">Customers & Loyalty</TabsTrigger>
           </TabsList>
 
+          {/* ── BOOKINGS TAB ── */}
           <TabsContent value="bookings" className="space-y-6">
-            {/* Filters */}
             <div className="flex flex-col sm:flex-row gap-3">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search by client or service..."
+                  placeholder="Search by name, phone, barber, or service..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-9 bg-card border-border"
@@ -278,7 +284,6 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            {/* Bookings List */}
             {isLoading ? (
               <p className="text-muted-foreground text-center py-12">Loading bookings...</p>
             ) : !filtered.length ? (
@@ -305,8 +310,18 @@ export default function AdminDashboard() {
                           <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
                             <span className="flex items-center gap-1">
                               <User className="h-3 w-3" />
-                              {b.profiles?.full_name || "Unknown"}
+                              {b.customer_name || "Unknown"}
                             </span>
+                            <span className="flex items-center gap-1">
+                              <Phone className="h-3 w-3" />
+                              {b.customer_phone || "-"}
+                            </span>
+                            {b.barber && (
+                              <span className="flex items-center gap-1">
+                                <Scissors className="h-3 w-3" />
+                                {b.barber}
+                              </span>
+                            )}
                             <span className="flex items-center gap-1">
                               <CalendarDays className="h-3 w-3" />
                               {b.booking_date}
@@ -363,13 +378,14 @@ export default function AdminDashboard() {
             )}
           </TabsContent>
 
-          <TabsContent value="users" className="space-y-6">
+          {/* ── CUSTOMERS & LOYALTY TAB ── */}
+          <TabsContent value="customers" className="space-y-6">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search users by name, email, or phone..."
-                value={usersSearch}
-                onChange={(e) => setUsersSearch(e.target.value)}
+                placeholder="Search customers by name, phone, or email..."
+                value={customersSearch}
+                onChange={(e) => setCustomersSearch(e.target.value)}
                 className="pl-9 bg-card border-border"
               />
             </div>
@@ -380,32 +396,43 @@ export default function AdminDashboard() {
                   <TableHeader className="bg-muted/50">
                     <TableRow className="border-border hover:bg-transparent">
                       <TableHead className="font-heading text-primary">Name</TableHead>
-                      <TableHead className="font-heading text-primary">Email</TableHead>
                       <TableHead className="font-heading text-primary">Phone</TableHead>
-                      <TableHead className="font-heading text-primary w-[80px]">Age</TableHead>
-                      <TableHead className="font-heading text-primary text-right">Role</TableHead>
+                      <TableHead className="font-heading text-primary">Email</TableHead>
+                      <TableHead className="font-heading text-primary w-[100px]">Visits</TableHead>
+                      <TableHead className="font-heading text-primary text-right">Loyalty</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {isLoadingProfiles ? (
+                    {isLoadingCustomers ? (
                       <TableRow>
-                        <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">Loading users...</TableCell>
+                        <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">Loading customers...</TableCell>
                       </TableRow>
-                    ) : filteredProfiles.length === 0 ? (
+                    ) : filteredCustomers.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">No users found.</TableCell>
+                        <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">No customers found.</TableCell>
                       </TableRow>
                     ) : (
-                      filteredProfiles.map((userProfile: any) => (
-                        <TableRow key={userProfile.id} className="border-border/50 hover:bg-primary/5 transition-colors">
-                          <TableCell className="font-medium text-foreground">{userProfile.full_name || "-"}</TableCell>
-                          <TableCell className="text-muted-foreground">{userProfile.email || "-"}</TableCell>
-                          <TableCell className="text-muted-foreground">{userProfile.phone_number || "-"}</TableCell>
-                          <TableCell className="text-muted-foreground">{userProfile.age || "-"}</TableCell>
+                      filteredCustomers.map((c: any) => (
+                        <TableRow key={c.id} className="border-border/50 hover:bg-primary/5 transition-colors">
+                          <TableCell className="font-medium text-foreground">{c.full_name || "-"}</TableCell>
+                          <TableCell className="text-muted-foreground">{c.phone || "-"}</TableCell>
+                          <TableCell className="text-muted-foreground">{c.email || "-"}</TableCell>
+                          <TableCell>
+                            <span className={`font-heading font-bold ${c.visit_count >= 5 ? "text-primary" : "text-foreground"}`}>
+                              {c.visit_count}
+                            </span>
+                          </TableCell>
                           <TableCell className="text-right">
-                            <Badge variant="outline" className={userProfile.is_barber ? "border-primary text-primary bg-primary/10" : "border-border text-muted-foreground"}>
-                              {userProfile.is_barber ? "Admin" : (userProfile.role || "User")}
-                            </Badge>
+                            {c.visit_count >= 5 ? (
+                              <Badge className="bg-primary/20 text-primary border-primary/30" variant="outline">
+                                <Gift className="h-3 w-3 mr-1" />
+                                Free 6th Visit!
+                              </Badge>
+                            ) : (
+                              <span className="text-xs text-muted-foreground">
+                                {5 - c.visit_count} visits to go
+                              </span>
+                            )}
                           </TableCell>
                         </TableRow>
                       ))
