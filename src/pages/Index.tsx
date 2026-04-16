@@ -11,6 +11,8 @@ import BookingModal from "@/components/BookingModal";
 import MyBookings from "@/components/MyBookings";
 import BarberDashboard from "@/components/BarberDashboard";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import BarbersSection from "@/components/BarbersSection";
+import MasterpieceSection from "@/components/MasterpieceSection";
 
 export default function Index() {
   const { user, signIn, signUp, signOut } = useAuth();
@@ -19,6 +21,7 @@ export default function Index() {
   const [myBookingsOpen, setMyBookingsOpen] = useState(false);
   const [barberOpen, setBarberOpen] = useState(false);
   const [isBarber, setIsBarber] = useState(false);
+  const [selectedBarber, setSelectedBarber] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     if (user) {
@@ -28,12 +31,17 @@ export default function Index() {
     }
   }, [user]);
 
-  const handleBookClick = () => {
+  const handleBookClick = (barberName?: string) => {
+    setSelectedBarber(barberName);
     if (!user) {
       setAuthOpen(true);
     } else {
       setBookOpen(true);
     }
+  };
+
+  const handleBookWithBarber = (barberName: string) => {
+    handleBookClick(barberName);
   };
 
   return (
@@ -42,13 +50,15 @@ export default function Index() {
         user={user}
         onSignOut={signOut}
         onAuthClick={() => setAuthOpen(true)}
-        onBookClick={handleBookClick}
+        onBookClick={() => handleBookClick()}
         onMyBookingsClick={() => setMyBookingsOpen(true)}
         onBarberClick={() => setBarberOpen(true)}
         isBarber={isBarber}
       />
-      <HeroSection onBookClick={handleBookClick} />
+      <HeroSection onBookClick={() => handleBookClick()} />
       <ServicesSection />
+      <BarbersSection onBookWithBarber={handleBookWithBarber} />
+      <MasterpieceSection />
       <AboutSection />
       <Footer />
       <WhatsAppButton />
@@ -56,7 +66,12 @@ export default function Index() {
       <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} onSignIn={signIn} onSignUp={signUp} />
       {user && (
         <>
-          <BookingModal open={bookOpen} onClose={() => setBookOpen(false)} userId={user.id} />
+          <BookingModal
+            open={bookOpen}
+            onClose={() => setBookOpen(false)}
+            userId={user.id}
+            selectedBarber={selectedBarber}
+          />
           <MyBookings open={myBookingsOpen} onClose={() => setMyBookingsOpen(false)} userId={user.id} />
           {isBarber && <BarberDashboard open={barberOpen} onClose={() => setBarberOpen(false)} />}
         </>
