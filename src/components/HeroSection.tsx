@@ -19,9 +19,9 @@ export default function HeroSection({ onBookClick }: HeroSectionProps) {
         <div className="absolute inset-0 bg-gradient-to-t from-surface via-surface/80 to-transparent" />
       </div>
       <div className="relative z-10 text-center px-4 max-w-3xl mx-auto animate-fade-in mt-16">
-        <p className="text-primary font-label text-sm tracking-[0.3em] uppercase mb-4">Where Heritage Meets Precision</p>
+        <p className="text-primary font-label text-sm tracking-[0.3em] uppercase mb-4">Alexandria's Premier Barbershop</p>
         <h1 className="font-heading text-5xl md:text-7xl lg:text-8xl text-foreground mb-6 leading-tight tracking-tight">
-          The <span className="italic text-primary">Sovereign</span> Standard
+          Kral <span className="italic text-primary">Salon</span>
         </h1>
         <p className="text-muted-foreground font-body text-lg md:text-xl mb-10 max-w-xl mx-auto font-light">
           {t("heroDescription")}
