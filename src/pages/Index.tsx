@@ -1,43 +1,21 @@
-import { useState, useEffect } from "react";
-import { useAuth } from "@/hooks/useAuth";
-import { getProfile } from "@/lib/supabase-helpers";
+import { useState } from "react";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import ServicesSection from "@/components/ServicesSection";
 import AboutSection from "@/components/AboutSection";
 import Footer from "@/components/Footer";
-import AuthModal from "@/components/AuthModal";
 import BookingModal from "@/components/BookingModal";
-import MyBookings from "@/components/MyBookings";
-import BarberDashboard from "@/components/BarberDashboard";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import BarbersSection from "@/components/BarbersSection";
 import MasterpieceSection from "@/components/MasterpieceSection";
 
 export default function Index() {
-  const { user, signIn, signUp, signOut } = useAuth();
-  const [authOpen, setAuthOpen] = useState(false);
   const [bookOpen, setBookOpen] = useState(false);
-  const [myBookingsOpen, setMyBookingsOpen] = useState(false);
-  const [barberOpen, setBarberOpen] = useState(false);
-  const [isBarber, setIsBarber] = useState(false);
   const [selectedBarber, setSelectedBarber] = useState<string | undefined>(undefined);
-
-  useEffect(() => {
-    if (user) {
-      getProfile(user.id).then((p) => setIsBarber(p?.is_barber ?? false)).catch(() => {});
-    } else {
-      setIsBarber(false);
-    }
-  }, [user]);
 
   const handleBookClick = (barberName?: string) => {
     setSelectedBarber(barberName);
-    if (!user) {
-      setAuthOpen(true);
-    } else {
-      setBookOpen(true);
-    }
+    setBookOpen(true);
   };
 
   const handleBookWithBarber = (barberName: string) => {
@@ -47,13 +25,13 @@ export default function Index() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar
-        user={user}
-        onSignOut={signOut}
-        onAuthClick={() => setAuthOpen(true)}
+        user={null}
+        onSignOut={() => {}}
+        onAuthClick={() => {}}
         onBookClick={() => handleBookClick()}
-        onMyBookingsClick={() => setMyBookingsOpen(true)}
-        onBarberClick={() => setBarberOpen(true)}
-        isBarber={isBarber}
+        onMyBookingsClick={() => {}}
+        onBarberClick={() => {}}
+        isBarber={false}
       />
       <HeroSection onBookClick={() => handleBookClick()} />
       <ServicesSection />
@@ -63,19 +41,11 @@ export default function Index() {
       <Footer />
       <WhatsAppButton />
 
-      <AuthModal open={authOpen} onClose={() => setAuthOpen(false)} onSignIn={signIn} onSignUp={signUp} />
-      {user && (
-        <>
-          <BookingModal
-            open={bookOpen}
-            onClose={() => setBookOpen(false)}
-            userId={user.id}
-            selectedBarber={selectedBarber}
-          />
-          <MyBookings open={myBookingsOpen} onClose={() => setMyBookingsOpen(false)} userId={user.id} />
-          {isBarber && <BarberDashboard open={barberOpen} onClose={() => setBarberOpen(false)} />}
-        </>
-      )}
+      <BookingModal
+        open={bookOpen}
+        onClose={() => setBookOpen(false)}
+        selectedBarber={selectedBarber}
+      />
     </div>
   );
 }
