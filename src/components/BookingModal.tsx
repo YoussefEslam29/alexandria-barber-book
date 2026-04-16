@@ -10,11 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { getServices, createBooking } from "@/lib/supabase-helpers";
 
-interface BookingModalProps {
-  open: boolean;
-  onClose: () => void;
-  userId: string;
-}
+const BARBER_OPTIONS = ["Any available barber", "Ahmed Kral", "Omar Khalil", "Youssef Adel"];
 
 const TIME_SLOTS = [
   "10:00", "10:30", "11:00", "11:30", "12:00", "12:30",
@@ -23,14 +19,27 @@ const TIME_SLOTS = [
   "19:00", "19:30", "20:00", "20:30", "21:00", "21:30",
 ];
 
-export default function BookingModal({ open, onClose, userId }: BookingModalProps) {
+interface BookingModalProps {
+  open: boolean;
+  onClose: () => void;
+  userId: string;
+  selectedBarber?: string;
+}
+
+export default function BookingModal({ open, onClose, userId, selectedBarber }: BookingModalProps) {
   const [serviceId, setServiceId] = useState("");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [notes, setNotes] = useState("");
+  const [barber, setBarber] = useState(selectedBarber || BARBER_OPTIONS[0]);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { lang, t } = useLanguage();
+
+  // Sync when selectedBarber prop changes (from barber card click)
+  if (selectedBarber && selectedBarber !== barber && open) {
+    setBarber(selectedBarber);
+  }
 
   const { data: services } = useQuery({
     queryKey: ["services"],
@@ -47,6 +56,12 @@ export default function BookingModal({ open, onClose, userId }: BookingModalProp
       setDate("");
       setTime("");
       setNotes("");
+      setBarber(BARBER_OPTIONS[0]);
+
+      // Smooth scroll to contacts/about section after modal closes
+      setTimeout(() => {
+        document.querySelector("#about")?.scrollIntoView({ behavior: "smooth" });
+      }, 300);
     },
     onError: (err: any) => {
       toast({ title: t("bookingFailed"), description: err.message, variant: "destructive" });
@@ -57,12 +72,17 @@ export default function BookingModal({ open, onClose, userId }: BookingModalProp
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const noteStr = [
+      barber !== BARBER_OPTIONS[0] ? `Barber: ${barber}` : "",
+      notes,
+    ].filter(Boolean).join(" | ");
+
     mutation.mutate({
       user_id: userId,
       service_id: serviceId,
       booking_date: date,
       booking_time: time,
-      notes: notes || undefined,
+      notes: noteStr || undefined,
     });
   };
 
@@ -73,6 +93,24 @@ export default function BookingModal({ open, onClose, userId }: BookingModalProp
           <DialogTitle className="font-heading text-3xl text-foreground mb-2">{t("bookAppointmentTitle")}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Barber preference */}
+          <div>
+            <Label className="text-muted-foreground font-label text-xs uppercase tracking-widest">{t("chooseBarber")}</Label>
+            <Select value={barber} onValueChange={setBarber}>
+              <SelectTrigger className="bg-surface ghost-border focus:border-primary focus:ring-1 focus:ring-primary transition-all mt-2">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-surface-container-high ghost-border">
+                {BARBER_OPTIONS.map((name) => (
+                  <SelectItem key={name} value={name} className="hover:bg-surface-container focus:bg-surface-container focus:text-primary">
+                    {name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Service */}
           <div>
             <Label className="text-muted-foreground font-label text-xs uppercase tracking-widest">{t("service")}</Label>
             <Select value={serviceId} onValueChange={setServiceId} required>
@@ -81,17 +119,21 @@ export default function BookingModal({ open, onClose, userId }: BookingModalProp
               </SelectTrigger>
               <SelectContent className="bg-surface-container-high ghost-border">
                 {services?.map((s) => (
-                  <SelectItem key={s.id} value={s.id} className="hover:bg-surface-container flex items-center focus:bg-surface-container focus:text-primary">
+                  <SelectItem key={s.id} value={s.id} className="hover:bg-surface-container focus:bg-surface-container focus:text-primary">
                     {lang === "ar" && s.name_ar ? s.name_ar : s.name} — {s.price} EGP
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
+
+          {/* Date */}
           <div>
             <Label className="text-muted-foreground font-label text-xs uppercase tracking-widest">{t("date")}</Label>
             <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} min={today} required className="bg-surface ghost-border focus:border-primary focus:ring-1 focus:ring-primary transition-all mt-2" />
           </div>
+
+          {/* Time */}
           <div>
             <Label className="text-muted-foreground font-label text-xs uppercase tracking-widest">{t("time")}</Label>
             <Select value={time} onValueChange={setTime} required>
@@ -105,11 +147,18 @@ export default function BookingModal({ open, onClose, userId }: BookingModalProp
               </SelectContent>
             </Select>
           </div>
+
+          {/* Notes */}
           <div>
             <Label className="text-muted-foreground font-label text-xs uppercase tracking-widest">{t("notesOptional")}</Label>
             <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder={t("notesPlaceholder")} className="bg-surface ghost-border focus:border-primary focus:ring-1 focus:ring-primary transition-all mt-2" />
           </div>
-          <Button type="submit" className="w-full bg-primary-gradient hover:opacity-90 text-primary-foreground font-label uppercase tracking-widest border-none shadow-[0_0_15px_rgba(0,219,231,0.2)] mt-4" disabled={mutation.isPending || !serviceId || !date || !time}>
+
+          <Button
+            type="submit"
+            className="w-full bg-primary-gradient hover:opacity-90 text-primary-foreground font-label uppercase tracking-widest border-none shadow-[0_0_15px_rgba(0,219,231,0.2)] mt-4"
+            disabled={mutation.isPending || !serviceId || !date || !time}
+          >
             {mutation.isPending ? t("booking") : t("confirmBooking")}
           </Button>
         </form>
