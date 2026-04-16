@@ -98,38 +98,38 @@ export default function AuthModal({ open, onClose, onSignIn, onSignUp }: AuthMod
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="bg-card border-border max-w-md">
+      <DialogContent className="bg-surface-container-highest ghost-border ambient-shadow max-w-md">
         <DialogHeader>
-          <DialogTitle className="font-heading text-2xl text-foreground">
+          <DialogTitle className="font-heading text-3xl text-foreground mb-2">
             {isSignUp ? t("createAccount") : t("signIn")}
           </DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-5">
           {isSignUp && (
             <>
               <div>
-                <Label htmlFor="fullName" className="text-muted-foreground">{t("fullName")}</Label>
-                <Input id="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)} required className="bg-muted border-border" />
+                <Label htmlFor="fullName" className="text-muted-foreground font-label text-xs uppercase tracking-widest">{t("fullName")}</Label>
+                <Input id="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)} required className="bg-surface ghost-border focus:border-primary focus:ring-1 focus:ring-primary transition-all mt-2" />
               </div>
               <div>
-                <Label htmlFor="phoneNumber" className="text-muted-foreground">Phone Number</Label>
-                <Input id="phoneNumber" type="tel" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} required className="bg-muted border-border" />
+                <Label htmlFor="phoneNumber" className="text-muted-foreground font-label text-xs uppercase tracking-widest">Phone Number</Label>
+                <Input id="phoneNumber" type="tel" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} required className="bg-surface ghost-border focus:border-primary focus:ring-1 focus:ring-primary transition-all mt-2" />
               </div>
               <div>
-                <Label htmlFor="age" className="text-muted-foreground">Age</Label>
-                <Input id="age" type="number" min="1" value={age} onChange={(e) => setAge(e.target.value)} required className="bg-muted border-border" />
+                <Label htmlFor="age" className="text-muted-foreground font-label text-xs uppercase tracking-widest">Age</Label>
+                <Input id="age" type="number" min="1" value={age} onChange={(e) => setAge(e.target.value)} required className="bg-surface ghost-border focus:border-primary focus:ring-1 focus:ring-primary transition-all mt-2" />
               </div>
             </>
           )}
           <div>
-            <Label htmlFor="email" className="text-muted-foreground">{t("email")}</Label>
-            <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="bg-muted border-border" />
+            <Label htmlFor="email" className="text-muted-foreground font-label text-xs uppercase tracking-widest">{t("email")}</Label>
+            <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="bg-surface ghost-border focus:border-primary focus:ring-1 focus:ring-primary transition-all mt-2" />
           </div>
           <div>
-            <Label htmlFor="password" className="text-muted-foreground">{t("password")}</Label>
-            <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} className="bg-muted border-border" />
+            <Label htmlFor="password" className="text-muted-foreground font-label text-xs uppercase tracking-widest">{t("password")}</Label>
+            <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} className="bg-surface ghost-border focus:border-primary focus:ring-1 focus:ring-primary transition-all mt-2" />
           </div>
-          <Button type="submit" className="w-full" disabled={loading}>
+          <Button type="submit" className="w-full bg-primary-gradient hover:opacity-90 text-primary-foreground font-label uppercase tracking-widest border-none shadow-[0_0_15px_rgba(0,219,231,0.2)]" disabled={loading}>
             {loading ? (
               <span className="flex items-center justify-center gap-2">
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -137,9 +137,9 @@ export default function AuthModal({ open, onClose, onSignIn, onSignUp }: AuthMod
               </span>
             ) : isSignUp ? t("signUp") : t("signIn")}
           </Button>
-          <p className="text-center text-sm text-muted-foreground">
+          <p className="text-center text-sm font-label text-muted-foreground">
             {isSignUp ? t("alreadyHaveAccount") : t("dontHaveAccount")}{" "}
-            <button type="button" onClick={() => setIsSignUp(!isSignUp)} className="text-primary hover:underline">
+            <button type="button" onClick={() => setIsSignUp(!isSignUp)} className="text-primary hover:text-white transition-colors">
               {isSignUp ? t("signIn") : t("signUp")}
             </button>
           </p>

@@ -60,26 +60,25 @@ function AdminLoginForm({ onLogin }: { onLogin: () => void }) {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-4">
-      <Card className="w-full max-w-md bg-card border-border">
+    <div className="min-h-screen bg-surface flex items-center justify-center px-4">
+      <Card className="w-full max-w-md bg-surface-container-highest ghost-border ambient-shadow">
         <CardHeader className="text-center space-y-3">
           <img src={kralLogo} alt="Kral Salon" className="h-16 w-16 rounded-full object-cover mx-auto" />
-          <CardTitle className="font-heading text-2xl text-foreground">Admin Dashboard</CardTitle>
-          <p className="text-sm text-muted-foreground">Sign in with your admin credentials</p>
+          <CardTitle className="font-heading text-3xl text-foreground mt-4">Admin Access</CardTitle>
+          <p className="text-sm font-label text-muted-foreground uppercase tracking-widest">Sign in to your atelier</p>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <Label htmlFor="admin-email" className="text-muted-foreground">Email</Label>
-              <Input id="admin-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="bg-muted border-border" />
+              <Label htmlFor="admin-email" className="text-muted-foreground font-label text-xs uppercase tracking-widest">Email</Label>
+              <Input id="admin-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="bg-surface ghost-border focus:border-primary focus:ring-1 focus:ring-primary transition-all mt-2" />
             </div>
             <div>
-              <Label htmlFor="admin-password" className="text-muted-foreground">Password</Label>
-              <Input id="admin-password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required className="bg-muted border-border" />
+              <Label htmlFor="admin-password" className="text-muted-foreground font-label text-xs uppercase tracking-widest">Password</Label>
+              <Input id="admin-password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required className="bg-surface ghost-border focus:border-primary focus:ring-1 focus:ring-primary transition-all mt-2" />
             </div>
-            {error && <p className="text-sm text-destructive">{error}</p>}
-            <Button type="submit" className="w-full" disabled={loading}>
-              <LogIn className="h-4 w-4 mr-2" />
+            {error && <p className="text-sm font-label text-destructive">{error}</p>}
+            <Button type="submit" className="w-full bg-primary-gradient hover:opacity-90 text-primary-foreground font-label uppercase tracking-widest border-none shadow-[0_0_15px_rgba(0,219,231,0.2)] mt-4" disabled={loading}>
               {loading ? "Signing in..." : "Sign In"}
             </Button>
           </form>

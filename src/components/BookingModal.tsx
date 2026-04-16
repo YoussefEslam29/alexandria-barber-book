@@ -68,20 +68,20 @@ export default function BookingModal({ open, onClose, userId }: BookingModalProp
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="bg-card border-border max-w-md">
+      <DialogContent className="bg-surface-container-highest ghost-border ambient-shadow max-w-md">
         <DialogHeader>
-          <DialogTitle className="font-heading text-2xl text-foreground">{t("bookAppointmentTitle")}</DialogTitle>
+          <DialogTitle className="font-heading text-3xl text-foreground mb-2">{t("bookAppointmentTitle")}</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <Label className="text-muted-foreground">{t("service")}</Label>
+            <Label className="text-muted-foreground font-label text-xs uppercase tracking-widest">{t("service")}</Label>
             <Select value={serviceId} onValueChange={setServiceId} required>
-              <SelectTrigger className="bg-muted border-border">
+              <SelectTrigger className="bg-surface ghost-border focus:border-primary focus:ring-1 focus:ring-primary transition-all mt-2">
                 <SelectValue placeholder={t("selectService")} />
               </SelectTrigger>
-              <SelectContent className="bg-card border-border">
+              <SelectContent className="bg-surface-container-high ghost-border">
                 {services?.map((s) => (
-                  <SelectItem key={s.id} value={s.id}>
+                  <SelectItem key={s.id} value={s.id} className="hover:bg-surface-container flex items-center focus:bg-surface-container focus:text-primary">
                     {lang === "ar" && s.name_ar ? s.name_ar : s.name} — {s.price} EGP
                   </SelectItem>
                 ))}
@@ -89,27 +89,27 @@ export default function BookingModal({ open, onClose, userId }: BookingModalProp
             </Select>
           </div>
           <div>
-            <Label className="text-muted-foreground">{t("date")}</Label>
-            <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} min={today} required className="bg-muted border-border" />
+            <Label className="text-muted-foreground font-label text-xs uppercase tracking-widest">{t("date")}</Label>
+            <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} min={today} required className="bg-surface ghost-border focus:border-primary focus:ring-1 focus:ring-primary transition-all mt-2" />
           </div>
           <div>
-            <Label className="text-muted-foreground">{t("time")}</Label>
+            <Label className="text-muted-foreground font-label text-xs uppercase tracking-widest">{t("time")}</Label>
             <Select value={time} onValueChange={setTime} required>
-              <SelectTrigger className="bg-muted border-border">
+              <SelectTrigger className="bg-surface ghost-border focus:border-primary focus:ring-1 focus:ring-primary transition-all mt-2">
                 <SelectValue placeholder={t("selectTime")} />
               </SelectTrigger>
-              <SelectContent className="bg-card border-border">
+              <SelectContent className="bg-surface-container-high ghost-border">
                 {TIME_SLOTS.map((slot) => (
-                  <SelectItem key={slot} value={slot}>{slot}</SelectItem>
+                  <SelectItem key={slot} value={slot} className="hover:bg-surface-container focus:bg-surface-container focus:text-primary">{slot}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
           <div>
-            <Label className="text-muted-foreground">{t("notesOptional")}</Label>
-            <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder={t("notesPlaceholder")} className="bg-muted border-border" />
+            <Label className="text-muted-foreground font-label text-xs uppercase tracking-widest">{t("notesOptional")}</Label>
+            <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder={t("notesPlaceholder")} className="bg-surface ghost-border focus:border-primary focus:ring-1 focus:ring-primary transition-all mt-2" />
           </div>
-          <Button type="submit" className="w-full" disabled={mutation.isPending || !serviceId || !date || !time}>
+          <Button type="submit" className="w-full bg-primary-gradient hover:opacity-90 text-primary-foreground font-label uppercase tracking-widest border-none shadow-[0_0_15px_rgba(0,219,231,0.2)] mt-4" disabled={mutation.isPending || !serviceId || !date || !time}>
             {mutation.isPending ? t("booking") : t("confirmBooking")}
           </Button>
         </form>
