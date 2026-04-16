@@ -15,8 +15,8 @@ export default function ServicesSection() {
       <div className="container mx-auto max-w-6xl">
         <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
           <div>
-            <p className="text-primary font-label text-sm tracking-[0.3em] uppercase mb-3">The Menu</p>
-            <h2 className="font-heading text-4xl md:text-5xl text-foreground tracking-tight">Curated <span className="text-primary italic">Grooming</span></h2>
+            <p className="text-primary font-label text-sm tracking-[0.3em] uppercase mb-3">{t("whatWeOffer")}</p>
+            <h2 className="font-heading text-4xl md:text-5xl text-foreground tracking-tight">Our <span className="text-primary italic">Services</span></h2>
           </div>
           <div className="h-[1px] flex-grow bg-surface-container-high hidden md:block mx-8 mb-2"></div>
         </div>
