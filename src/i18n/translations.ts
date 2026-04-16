@@ -3,10 +3,16 @@ export type Lang = "en" | "ar";
 export const translations = {
   // Navbar
   services: { en: "Services", ar: "الخدمات" },
+  barbers: { en: "Barbers", ar: "الحلاقون" },
+  masterpiece: { en: "Masterpiece", ar: "المحفوظات" },
   about: { en: "About", ar: "من نحن" },
   myBookings: { en: "My Bookings", ar: "حجوزاتي" },
   adminDashboard: { en: "Admin Dashboard", ar: "لوحة التحكم" },
   bookNow: { en: "Book Now", ar: "احجز الآن" },
+  bookWithMe: { en: "Book with me", ar: "احجز معي" },
+  meetTheTeam: { en: "Meet the Team", ar: "تعرف على الفريق" },
+  recentWork: { en: "Recent Work", ar: "أعمالنا الأخيرة" },
+  viewMoreOnInstagram: { en: "View more on Instagram", ar: "المزيد على إنستغرام" },
   signIn: { en: "Sign In", ar: "تسجيل الدخول" },
   signOut: { en: "Sign Out", ar: "تسجيل الخروج" },
 
@@ -17,6 +23,10 @@ export const translations = {
     ar: "تجربة حلاقة فاخرة في الإسكندرية. قصات كلاسيكية، أسلوب عصري.",
   },
   bookAppointment: { en: "Book Your Appointment", ar: "احجز موعدك" },
+
+  // Barbers
+  chooseBarber: { en: "Choose a Barber (optional)", ar: "اختر حلاق (اختياري)" },
+  anyBarber: { en: "Any available barber", ar: "أي حلاق متاح" },
 
   // Services
   whatWeOffer: { en: "What We Offer", ar: "ما نقدمه" },
