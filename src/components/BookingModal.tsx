@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { getServices, createBooking } from "@/lib/supabase-helpers";
+import { getServices, createPublicBooking } from "@/lib/supabase-helpers";
 
 const BARBER_OPTIONS = ["Any available barber", "Ahmed Kral", "Omar Khalil", "Youssef Adel"];
 
@@ -22,11 +22,13 @@ const TIME_SLOTS = [
 interface BookingModalProps {
   open: boolean;
   onClose: () => void;
-  userId: string;
   selectedBarber?: string;
 }
 
-export default function BookingModal({ open, onClose, userId, selectedBarber }: BookingModalProps) {
+export default function BookingModal({ open, onClose, selectedBarber }: BookingModalProps) {
+  const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
   const [serviceId, setServiceId] = useState("");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
@@ -47,16 +49,18 @@ export default function BookingModal({ open, onClose, userId, selectedBarber }: 
   });
 
   const mutation = useMutation({
-    mutationFn: createBooking,
-    onSuccess: () => {
-      toast({ title: t("booked"), description: t("appointmentConfirmed") });
+    mutationFn: createPublicBooking,
+    onSuccess: (result) => {
+      const visitMsg = result.customer.visit_count >= 5
+        ? " 🎉 You're close to your FREE 6th visit!"
+        : "";
+      toast({
+        title: t("booked"),
+        description: (t("appointmentConfirmed") || "Your appointment has been confirmed.") + visitMsg,
+      });
       queryClient.invalidateQueries({ queryKey: ["bookings"] });
       onClose();
-      setServiceId("");
-      setDate("");
-      setTime("");
-      setNotes("");
-      setBarber(BARBER_OPTIONS[0]);
+      resetForm();
 
       // Smooth scroll to contacts/about section after modal closes
       setTimeout(() => {
@@ -68,36 +72,82 @@ export default function BookingModal({ open, onClose, userId, selectedBarber }: 
     },
   });
 
+  const resetForm = () => {
+    setFullName("");
+    setPhone("");
+    setEmail("");
+    setServiceId("");
+    setDate("");
+    setTime("");
+    setNotes("");
+    setBarber(BARBER_OPTIONS[0]);
+  };
+
   const today = new Date().toISOString().split("T")[0];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const noteStr = [
-      barber !== BARBER_OPTIONS[0] ? `Barber: ${barber}` : "",
-      notes,
-    ].filter(Boolean).join(" | ");
-
     mutation.mutate({
-      user_id: userId,
+      customer_name: fullName,
+      customer_phone: phone,
+      customer_email: email,
       service_id: serviceId,
       booking_date: date,
       booking_time: time,
-      notes: noteStr || undefined,
+      barber: barber !== BARBER_OPTIONS[0] ? barber : "",
+      notes: notes || undefined,
     });
   };
 
+  const inputClass = "bg-surface ghost-border focus:border-primary focus:ring-1 focus:ring-primary transition-all mt-2";
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="bg-surface-container-highest ghost-border ambient-shadow max-w-md">
+      <DialogContent className="bg-surface-container-highest ghost-border ambient-shadow max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="font-heading text-3xl text-foreground mb-2">{t("bookAppointmentTitle")}</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Customer Info */}
+          <div>
+            <Label className="text-muted-foreground font-label text-xs uppercase tracking-widest">{t("fullName")}</Label>
+            <Input
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              required
+              placeholder="Ahmed Mohamed"
+              className={inputClass}
+            />
+          </div>
+          <div>
+            <Label className="text-muted-foreground font-label text-xs uppercase tracking-widest">{t("phoneNumber")}</Label>
+            <Input
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              required
+              placeholder="01XXXXXXXXX"
+              className={inputClass}
+            />
+          </div>
+          <div>
+            <Label className="text-muted-foreground font-label text-xs uppercase tracking-widest">{t("email")}</Label>
+            <Input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="optional@email.com"
+              className={inputClass}
+            />
+          </div>
+
+          <div className="h-[1px] bg-surface-container-high my-2" />
+
           {/* Barber preference */}
           <div>
             <Label className="text-muted-foreground font-label text-xs uppercase tracking-widest">{t("chooseBarber")}</Label>
             <Select value={barber} onValueChange={setBarber}>
-              <SelectTrigger className="bg-surface ghost-border focus:border-primary focus:ring-1 focus:ring-primary transition-all mt-2">
+              <SelectTrigger className={inputClass}>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="bg-surface-container-high ghost-border">
@@ -114,7 +164,7 @@ export default function BookingModal({ open, onClose, userId, selectedBarber }: 
           <div>
             <Label className="text-muted-foreground font-label text-xs uppercase tracking-widest">{t("service")}</Label>
             <Select value={serviceId} onValueChange={setServiceId} required>
-              <SelectTrigger className="bg-surface ghost-border focus:border-primary focus:ring-1 focus:ring-primary transition-all mt-2">
+              <SelectTrigger className={inputClass}>
                 <SelectValue placeholder={t("selectService")} />
               </SelectTrigger>
               <SelectContent className="bg-surface-container-high ghost-border">
@@ -130,14 +180,14 @@ export default function BookingModal({ open, onClose, userId, selectedBarber }: 
           {/* Date */}
           <div>
             <Label className="text-muted-foreground font-label text-xs uppercase tracking-widest">{t("date")}</Label>
-            <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} min={today} required className="bg-surface ghost-border focus:border-primary focus:ring-1 focus:ring-primary transition-all mt-2" />
+            <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} min={today} required className={inputClass} />
           </div>
 
           {/* Time */}
           <div>
             <Label className="text-muted-foreground font-label text-xs uppercase tracking-widest">{t("time")}</Label>
             <Select value={time} onValueChange={setTime} required>
-              <SelectTrigger className="bg-surface ghost-border focus:border-primary focus:ring-1 focus:ring-primary transition-all mt-2">
+              <SelectTrigger className={inputClass}>
                 <SelectValue placeholder={t("selectTime")} />
               </SelectTrigger>
               <SelectContent className="bg-surface-container-high ghost-border">
@@ -151,13 +201,13 @@ export default function BookingModal({ open, onClose, userId, selectedBarber }: 
           {/* Notes */}
           <div>
             <Label className="text-muted-foreground font-label text-xs uppercase tracking-widest">{t("notesOptional")}</Label>
-            <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder={t("notesPlaceholder")} className="bg-surface ghost-border focus:border-primary focus:ring-1 focus:ring-primary transition-all mt-2" />
+            <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder={t("notesPlaceholder")} className={inputClass} />
           </div>
 
           <Button
             type="submit"
             className="w-full bg-primary-gradient hover:opacity-90 text-primary-foreground font-label uppercase tracking-widest border-none shadow-[0_0_15px_rgba(0,219,231,0.2)] mt-4"
-            disabled={mutation.isPending || !serviceId || !date || !time}
+            disabled={mutation.isPending || !fullName || !phone || !serviceId || !date || !time}
           >
             {mutation.isPending ? t("booking") : t("confirmBooking")}
           </Button>
