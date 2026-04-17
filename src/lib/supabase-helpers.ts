@@ -131,9 +131,29 @@ export async function getProfile(userId: string) {
 }
 
 export async function getAllProfiles() {
-  const { data, error } = await supabase.from("profiles").select("*").order("created_at", { ascending: false });
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("id, user_id, full_name, phone, is_barber, created_at, updated_at, phone_number, age, role, email")
+    .order("created_at", { ascending: false });
   if (error) throw error;
-  return data;
+  return (data ?? []) as any[];
+}
+
+export async function getBookingsPerBarber(): Promise<{ barber: string; count: number }[]> {
+  const { data, error } = await supabase
+    .from("bookings")
+    .select("barber")
+    .not("barber", "is", null)
+    .neq("barber", "");
+  if (error) throw error;
+  const counts: Record<string, number> = {};
+  for (const row of (data ?? []) as any[]) {
+    const b = (row.barber as string) || "Unassigned";
+    counts[b] = (counts[b] ?? 0) + 1;
+  }
+  return Object.entries(counts)
+    .map(([barber, count]) => ({ barber, count }))
+    .sort((a, b) => b.count - a.count);
 }
 
 export async function getUserBookings(userId: string) {
