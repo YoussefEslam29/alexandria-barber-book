@@ -15,7 +15,8 @@ export async function getServices() {
 export async function findOrCreateCustomer(
   fullName: string,
   phone: string,
-  email: string
+  email: string,
+  age?: number
 ): Promise<{ id: string; visit_count: number }> {
   // Try to find existing customer by phone
   const { data: existing } = await supabase
@@ -29,7 +30,7 @@ export async function findOrCreateCustomer(
     const newCount = ((existing as any).visit_count || 0) + 1;
     await supabase
       .from("customers" as any)
-      .update({ visit_count: newCount, full_name: fullName, email } as any)
+      .update({ visit_count: newCount, full_name: fullName, email, age } as any)
       .eq("id", (existing as any).id);
     return { id: (existing as any).id, visit_count: newCount };
   }
@@ -37,7 +38,7 @@ export async function findOrCreateCustomer(
   // Create new customer
   const { data: newCustomer, error } = await supabase
     .from("customers" as any)
-    .insert({ full_name: fullName, phone, email, visit_count: 1 } as any)
+    .insert({ full_name: fullName, phone, email, age, visit_count: 1 } as any)
     .select()
     .single();
 
@@ -52,6 +53,7 @@ export async function createPublicBooking(params: {
   customer_name: string;
   customer_phone: string;
   customer_email: string;
+  customer_age?: number;
   service_id: string;
   booking_date: string;
   booking_time: string;
@@ -62,7 +64,8 @@ export async function createPublicBooking(params: {
   const customer = await findOrCreateCustomer(
     params.customer_name,
     params.customer_phone,
-    params.customer_email
+    params.customer_email,
+    params.customer_age
   );
 
   // Create the booking
@@ -72,6 +75,7 @@ export async function createPublicBooking(params: {
       customer_name: params.customer_name,
       customer_phone: params.customer_phone,
       customer_email: params.customer_email,
+      customer_age: params.customer_age,
       service_id: params.service_id,
       booking_date: params.booking_date,
       booking_time: params.booking_time,

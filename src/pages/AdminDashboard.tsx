@@ -225,9 +225,11 @@ export default function AdminDashboard() {
   const totalKings = profiles.length;
   const revenueForecast = totalBookings * 150;
   const topBarber = barberChartData[0]?.barber ?? "N/A";
-  const profilesWithAge = profiles.filter((p: any) => p.age != null && p.age > 0);
-  const avgAge = profilesWithAge.length
-    ? Math.round(profilesWithAge.reduce((s: number, p: any) => s + (p.age as number), 0) / profilesWithAge.length)
+  const profilesWithAge = profiles.filter((p: any) => p.age != null && p.age > 0).map((p: any) => p.age);
+  const customersWithAge = customers.filter((c: any) => c.age != null && c.age > 0).map((c: any) => c.age);
+  const allAges = [...profilesWithAge, ...customersWithAge];
+  const avgAge = allAges.length
+    ? Math.round(allAges.reduce((s: number, age: number) => s + age, 0) / allAges.length)
     : null;
 
   const biStats = [
@@ -406,6 +408,12 @@ export default function AdminDashboard() {
                               <Phone className="h-3 w-3" />
                               {b.customer_phone || "-"}
                             </span>
+                            {(b.customer_age || b.age) && (
+                              <span className="flex items-center gap-1">
+                                <User className="h-3 w-3" />
+                                {b.customer_age || b.age} yrs
+                              </span>
+                            )}
                             {b.barber && (
                               <span className="flex items-center gap-1">
                                 <Scissors className="h-3 w-3" />
@@ -523,6 +531,7 @@ export default function AdminDashboard() {
                   <TableHeader className="bg-muted/50">
                     <TableRow className="border-border hover:bg-transparent">
                       <TableHead className="font-heading text-primary">Name</TableHead>
+                      <TableHead className="font-heading text-primary">Age</TableHead>
                       <TableHead className="font-heading text-primary">Phone</TableHead>
                       <TableHead className="font-heading text-primary">Email</TableHead>
                       <TableHead className="font-heading text-primary w-[100px]">Visits</TableHead>
@@ -542,6 +551,7 @@ export default function AdminDashboard() {
                       filteredCustomers.map((c: any) => (
                         <TableRow key={c.id} className="border-border/50 hover:bg-primary/5 transition-colors">
                           <TableCell className="font-medium text-foreground">{c.full_name || "-"}</TableCell>
+                          <TableCell className="text-muted-foreground">{c.age || "-"}</TableCell>
                           <TableCell className="text-muted-foreground">{c.phone || "-"}</TableCell>
                           <TableCell className="text-muted-foreground">{c.email || "-"}</TableCell>
                           <TableCell>

@@ -28,6 +28,7 @@ interface BookingModalProps {
 
 export default function BookingModal({ open, onClose, selectedBarber }: BookingModalProps) {
   const [fullName, setFullName] = useState("");
+  const [age, setAge] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [serviceId, setServiceId] = useState("");
@@ -75,6 +76,7 @@ export default function BookingModal({ open, onClose, selectedBarber }: BookingM
 
   const resetForm = () => {
     setFullName("");
+    setAge("");
     setPhone("");
     setEmail("");
     setServiceId("");
@@ -92,6 +94,7 @@ export default function BookingModal({ open, onClose, selectedBarber }: BookingM
       customer_name: fullName,
       customer_phone: phone,
       customer_email: email,
+      customer_age: age ? parseInt(age) : undefined,
       service_id: serviceId,
       booking_date: date,
       booking_time: time,
@@ -118,6 +121,19 @@ export default function BookingModal({ open, onClose, selectedBarber }: BookingM
               required
               placeholder="Ahmed Mohamed"
               className={inputClass}
+            />
+          </div>
+          <div>
+            <Label className="text-muted-foreground font-label text-xs uppercase tracking-widest">{t("age")}</Label>
+            <Input
+              type="number"
+              value={age}
+              onChange={(e) => setAge(e.target.value)}
+              required
+              placeholder="25"
+              className={inputClass}
+              min="1"
+              max="120"
             />
           </div>
           <div>
@@ -210,7 +226,7 @@ export default function BookingModal({ open, onClose, selectedBarber }: BookingM
           <Button
             type="submit"
             className="w-full bg-primary-gradient hover:opacity-90 text-primary-foreground font-label uppercase tracking-widest border-none shadow-[0_0_15px_rgba(0,219,231,0.2)] mt-4"
-            disabled={mutation.isPending || !fullName || !phone || !serviceId || !date || !time}
+            disabled={mutation.isPending || !fullName || !phone || !serviceId || !date || !time || !age}
           >
             {mutation.isPending ? t("booking") : t("confirmBooking")}
           </Button>

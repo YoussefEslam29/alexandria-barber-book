@@ -52,6 +52,7 @@ export const translations = {
   // Auth
   createAccount: { en: "Create Account", ar: "إنشاء حساب" },
   fullName: { en: "Full Name", ar: "الاسم الكامل" },
+  age: { en: "Age", ar: "العمر" },
   phoneNumber: { en: "Phone Number", ar: "رقم الهاتف" },
   email: { en: "Email", ar: "البريد الإلكتروني" },
   password: { en: "Password", ar: "كلمة المرور" },
