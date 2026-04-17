@@ -63,7 +63,8 @@ async function getGallery(): Promise<GalleryItem[]> {
       .select("*")
       .order("created_at", { ascending: false });
     if (error || !data) return FALLBACK_GALLERY;
-    return (data as GalleryItem[]).length > 0 ? (data as GalleryItem[]) : FALLBACK_GALLERY;
+    const items = data as unknown as GalleryItem[];
+    return items.length > 0 ? items : FALLBACK_GALLERY;
   } catch {
     return FALLBACK_GALLERY;
   }
