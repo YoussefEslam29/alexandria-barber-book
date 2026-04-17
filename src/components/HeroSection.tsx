@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/i18n/LanguageContext";
+import heroImg from "@/assets/hero-barbershop.jpg";
 
 interface HeroSectionProps {
   onBookClick: () => void;
@@ -12,7 +13,7 @@ export default function HeroSection({ onBookClick }: HeroSectionProps) {
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-surface">
       <div className="absolute inset-0">
         <img 
-          src="https://images.unsplash.com/photo-1599351431202-1e0f0137899a?q=80&w=2072&auto=format&fit=crop" 
+          src={heroImg} 
           alt="Kral Salon barbershop interior" 
           className="w-full h-full object-cover opacity-30 grayscale mix-blend-luminosity" 
         />
@@ -26,13 +27,23 @@ export default function HeroSection({ onBookClick }: HeroSectionProps) {
         <p className="text-muted-foreground font-body text-lg md:text-xl mb-10 max-w-xl mx-auto font-light">
           {t("heroDescription")}
         </p>
-        <Button 
-          onClick={onBookClick} 
-          size="lg" 
-          className="text-primary-foreground font-label tracking-widest uppercase bg-primary-gradient hover:opacity-90 border-none rounded-md px-10 py-7 text-base shadow-[0_0_20px_rgba(0,219,231,0.2)] transition-all"
-        >
-          {t("bookAppointment")}
-        </Button>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <Button 
+            onClick={onBookClick} 
+            size="lg" 
+            className="text-primary-foreground font-label tracking-widest uppercase bg-primary-gradient hover:opacity-90 border-none rounded-md px-10 py-7 text-base shadow-[0_0_20px_rgba(0,219,231,0.2)] transition-all w-full sm:w-auto"
+          >
+            {t("bookAppointment")}
+          </Button>
+          <Button
+            asChild
+            variant="outline"
+            size="lg"
+            className="ghost-border text-foreground font-label tracking-widest uppercase hover:bg-surface-container-high transition-all rounded-md px-10 py-7 text-base w-full sm:w-auto"
+          >
+            <a href="#services">{t("exploreServices")}</a>
+          </Button>
+        </div>
       </div>
     </section>
   );
