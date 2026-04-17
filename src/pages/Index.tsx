@@ -8,6 +8,7 @@ import BookingModal from "@/components/BookingModal";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import BarbersSection from "@/components/BarbersSection";
 import MasterpieceSection from "@/components/MasterpieceSection";
+import ExperienceSection from "@/components/ExperienceSection";
 
 export default function Index() {
   const [bookOpen, setBookOpen] = useState(false);
@@ -34,6 +35,7 @@ export default function Index() {
         isBarber={false}
       />
       <HeroSection onBookClick={() => handleBookClick()} />
+      <ExperienceSection />
       <ServicesSection />
       <BarbersSection onBookWithBarber={handleBookWithBarber} />
       <MasterpieceSection />

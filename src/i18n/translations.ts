@@ -93,6 +93,28 @@ export const translations = {
   cancel: { en: "Cancel", ar: "إلغاء" },
   bookingCancelled: { en: "Booking cancelled", ar: "تم إلغاء الحجز" },
 
+  // Experience
+  expBio1: { en: "\"A glimpse into the premium industrial grooming experience we deliver every day. ", ar: "\"لمحة عن تجربة العناية الفاخرة التي نقدمها كل يوم. " },
+  expBio2: { en: "Precision", ar: "دقة" },
+  expBio3: { en: " in motion.\"", ar: " في الحركة.\"" },
+  expFeature1Title: { en: "Ultimate Convenience", ar: "الراحة التامة" },
+  expFeature1Desc: { en: "Book your perfect look anytime, anywhere — no calls, no waiting.", ar: "احجز مظهرك المثالي في أي وقت وفي أي مكان — بدون مكالمات، بدون انتظار." },
+  expFeature2Title: { en: "Absolute Hygiene", ar: "نظافة مطلقة" },
+  expFeature2Desc: { en: "Hospital-grade sanitation with single-use tools on every visit.", ar: "تعقيم على مستوى المستشفيات مع أدوات ذات استخدام واحد في كل زيارة." },
+  expFeature3Title: { en: "Flexible Scheduling", ar: "مواعيد مرنة" },
+  expFeature3Desc: { en: "Morning, noon, or night — we work around your schedule.", ar: "صباحاً، ظهراً، أو ليلاً — نحن نعمل وفقاً لجدولك." },
+  expFeature4Title: { en: "Trusted Experts", ar: "خبراء موثوقون" },
+  expFeature4Desc: { en: "Hand-picked master barbers with years of premium experience.", ar: "حلاقون خبراء مختارون بعناية مع سنوات من الخبرة الفاخرة." },
+  howItWorks: { en: "How It Works", ar: "كيف تعمل" },
+  effortless: { en: "Effortless", ar: "بسهولة" },
+  bookingWord: { en: "Booking", ar: "الحجز" },
+  expStep1Title: { en: "Explore Experts", ar: "استكشف الخبراء" },
+  expStep1Desc: { en: "Browse profiles and pick a master barber that matches your style.", ar: "تصفح الملفات الشخصية واختر الحلاق الخبير الذي يتناسب مع أسلوبك." },
+  expStep2Title: { en: "Choose Time", ar: "اختر الوقت" },
+  expStep2Desc: { en: "Select your desired service and slot.", ar: "حدد الخدمة والوقت الذي تريده." },
+  expStep3Title: { en: "Instant Confirmation", ar: "تأكيد فوري" },
+  expStep3Desc: { en: "Sit back and relax. Your experience is secured.", ar: "استرخِ وارتاح. تجربتك مضمونة." },
+
   // Footer
   footerText: {
     en: "Kral Salon — Alexandria, Egypt.",
