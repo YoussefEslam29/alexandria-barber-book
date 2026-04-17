@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { getAllBookings, updateBookingStatus } from "@/lib/supabase-helpers";
 import { useToast } from "@/hooks/use-toast";
+import { formatTime12h } from "@/lib/utils";
 import { CalendarDays, Clock, User } from "lucide-react";
 
 interface BarberDashboardProps {
@@ -61,7 +62,7 @@ export default function BarberDashboard({ open, onClose }: BarberDashboardProps)
                 </div>
                 <div className="flex items-center gap-4 text-muted-foreground text-sm mb-3">
                   <span className="flex items-center gap-1"><CalendarDays className="h-3 w-3" />{b.booking_date}</span>
-                  <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{b.booking_time}</span>
+                  <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{formatTime12h(b.booking_time)}</span>
                   <span className="text-primary">{b.services?.price} EGP</span>
                 </div>
                 {b.notes && <p className="text-muted-foreground text-xs mb-3">Notes: {b.notes}</p>}

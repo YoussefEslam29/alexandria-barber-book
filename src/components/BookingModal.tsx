@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { getServices, createPublicBooking } from "@/lib/supabase-helpers";
+import { formatTime12h } from "@/lib/utils";
 
 const BARBER_OPTIONS = ["Any available barber", "Ahmed Kral", "Omar Khalil", "Youssef Adel"];
 
@@ -192,7 +193,9 @@ export default function BookingModal({ open, onClose, selectedBarber }: BookingM
               </SelectTrigger>
               <SelectContent className="bg-surface-container-high ghost-border">
                 {TIME_SLOTS.map((slot) => (
-                  <SelectItem key={slot} value={slot} className="hover:bg-surface-container focus:bg-surface-container focus:text-primary">{slot}</SelectItem>
+                  <SelectItem key={slot} value={slot} className="hover:bg-surface-container focus:bg-surface-container focus:text-primary">
+                    {formatTime12h(slot)}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>

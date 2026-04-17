@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { getUserBookings, updateBookingStatus } from "@/lib/supabase-helpers";
 import { useToast } from "@/hooks/use-toast";
+import { formatTime12h } from "@/lib/utils";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { CalendarDays, Clock } from "lucide-react";
 
@@ -59,7 +60,7 @@ export default function MyBookings({ open, onClose, userId }: MyBookingsProps) {
                 </div>
                 <div className="flex items-center gap-4 text-muted-foreground text-sm mb-2">
                   <span className="flex items-center gap-1"><CalendarDays className="h-3 w-3" />{b.booking_date}</span>
-                  <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{b.booking_time}</span>
+                  <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{formatTime12h(b.booking_time)}</span>
                 </div>
                 <p className="text-primary text-sm">{b.services?.price} EGP</p>
                 {b.status === "pending" && (

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { getProfile, getAllBookings, updateBookingStatus, getAllCustomers } from "@/lib/supabase-helpers";
+import { formatTime12h } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -328,7 +329,7 @@ export default function AdminDashboard() {
                             </span>
                             <span className="flex items-center gap-1">
                               <Clock className="h-3 w-3" />
-                              {b.booking_time}
+                              {formatTime12h(b.booking_time)}
                             </span>
                             <span className="text-primary font-medium">
                               {b.services?.price} EGP
