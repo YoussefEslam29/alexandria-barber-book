@@ -68,10 +68,11 @@ export async function createPublicBooking(params: {
     params.customer_age
   );
 
-  // Create the booking
+  // Create the booking — explicitly set user_id to null for guest bookings
   const { data, error } = await supabase
     .from("bookings")
     .insert({
+      user_id: null,
       customer_name: params.customer_name,
       customer_phone: params.customer_phone,
       customer_email: params.customer_email,
@@ -81,12 +82,57 @@ export async function createPublicBooking(params: {
       booking_time: params.booking_time,
       barber: params.barber,
       notes: params.notes,
+      status: "pending",
     } as any)
     .select()
     .single();
 
   if (error) throw error;
+  if (!data) throw new Error("Booking was not created — no data returned.");
   return { booking: data, customer };
+}
+
+// ───────────────────────────────────────────────
+// Walk-in booking (admin only — status = accepted)
+// ───────────────────────────────────────────────
+export async function createWalkinBooking(params: {
+  customer_name: string;
+  customer_phone: string;
+  customer_age?: number;
+  barber: string;
+  booking_time: string;
+  service_id: string;
+  status: "accepted" | "completed";
+}) {
+  const todayStr = new Date().toISOString().split("T")[0];
+
+  // Also track the walk-in in the customers table
+  await findOrCreateCustomer(
+    params.customer_name,
+    params.customer_phone,
+    "",
+    params.customer_age
+  );
+
+  const { data, error } = await supabase
+    .from("bookings")
+    .insert({
+      user_id: null,
+      customer_name: params.customer_name,
+      customer_phone: params.customer_phone,
+      customer_age: params.customer_age,
+      service_id: params.service_id,
+      booking_date: todayStr,
+      booking_time: params.booking_time,
+      barber: params.barber,
+      status: params.status,
+      is_walkin: true,
+    } as any)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
 }
 
 // ─── Legacy createBooking kept for compatibility ───
@@ -123,8 +169,12 @@ export async function getAllCustomers() {
   return data as any[];
 }
 
-export async function updateBookingStatus(bookingId: string, status: string) {
-  const { error } = await supabase.from("bookings").update({ status }).eq("id", bookingId);
+export async function updateBookingStatus(bookingId: string, status: string, rejectionReason?: string) {
+  const update: Record<string, any> = { status };
+  if (rejectionReason !== undefined) {
+    update.rejection_reason = rejectionReason;
+  }
+  const { error } = await supabase.from("bookings").update(update).eq("id", bookingId);
   if (error) throw error;
 }
 
@@ -158,6 +208,17 @@ export async function getBookingsPerBarber(): Promise<{ barber: string; count: n
   return Object.entries(counts)
     .map(([barber, count]) => ({ barber, count }))
     .sort((a, b) => b.count - a.count);
+}
+
+// ─── Public booking lookup by phone (for user status view) ───
+export async function getBookingsByPhone(phone: string) {
+  const { data, error } = await supabase
+    .from("bookings")
+    .select("*, services(*)")
+    .eq("customer_phone", phone)
+    .order("booking_date", { ascending: false });
+  if (error) throw error;
+  return data;
 }
 
 export async function getUserBookings(userId: string) {

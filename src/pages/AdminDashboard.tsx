@@ -2,12 +2,15 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
-import { getProfile, getAllBookings, updateBookingStatus, getAllCustomers, getAllProfiles, getBookingsPerBarber } from "@/lib/supabase-helpers";
+import { getProfile, getAllBookings, updateBookingStatus, getAllCustomers, getAllProfiles, getBookingsPerBarber, getServices, createWalkinBooking } from "@/lib/supabase-helpers";
 import { formatTime12h } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -33,16 +36,28 @@ import {
   Crown,
   BarChart2,
   UserCheck,
+  XCircle,
+  Plus,
+  AlertCircle,
 } from "lucide-react";
+
+const BARBER_OPTIONS = ["Ahmed Kral", "Omar Khalil", "Youssef Adel"];
+const TIME_SLOTS = [
+  "10:00","10:30","11:00","11:30","12:00","12:30","13:00","13:30",
+  "14:00","14:30","15:00","15:30","16:00","16:30","17:00","17:30",
+  "18:00","18:30","19:00","19:30","20:00","20:30","21:00","21:30",
+];
 
 const statusColors: Record<string, string> = {
   pending: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
+  accepted: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30",
   confirmed: "bg-green-500/20 text-green-400 border-green-500/30",
   completed: "bg-blue-500/20 text-blue-400 border-blue-500/30",
   cancelled: "bg-red-500/20 text-red-400 border-red-500/30",
+  rejected: "bg-red-500/20 text-red-400 border-red-500/30",
 };
 
-type StatusFilter = "all" | "pending" | "confirmed" | "completed" | "cancelled";
+type StatusFilter = "all" | "pending" | "accepted" | "confirmed" | "completed" | "cancelled" | "rejected";
 
 function AdminLoginForm({ onLogin }: { onLogin: () => void }) {
   const [email, setEmail] = useState("");
@@ -104,6 +119,18 @@ export default function AdminDashboard() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [customersSearch, setCustomersSearch] = useState("");
+  // Walk-in modal
+  const [walkinOpen, setWalkinOpen] = useState(false);
+  const [wiName, setWiName] = useState("");
+  const [wiPhone, setWiPhone] = useState("");
+  const [wiAge, setWiAge] = useState("");
+  const [wiBarber, setWiBarber] = useState(BARBER_OPTIONS[0]);
+  const [wiTime, setWiTime] = useState("");
+  const [wiService, setWiService] = useState("");
+  const [wiStatus, setWiStatus] = useState<"accepted" | "completed">("accepted");
+  // Rejection modal
+  const [rejectId, setRejectId] = useState<string | null>(null);
+  const [rejectReason, setRejectReason] = useState("");
 
   const checkBarberStatus = async (userId: string) => {
     try {
@@ -159,13 +186,31 @@ export default function AdminDashboard() {
     refetchInterval: 30000,
   });
 
+  const { data: services = [] } = useQuery({
+    queryKey: ["services"],
+    queryFn: getServices,
+    enabled: isBarber,
+  });
+
   const statusMutation = useMutation({
-    mutationFn: ({ id, status }: { id: string; status: string }) =>
-      updateBookingStatus(id, status),
+    mutationFn: ({ id, status, rejectionReason }: { id: string; status: string; rejectionReason?: string }) =>
+      updateBookingStatus(id, status, rejectionReason),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-bookings"] });
       toast({ title: "Booking updated successfully" });
     },
+  });
+
+  const walkinMutation = useMutation({
+    mutationFn: createWalkinBooking,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-bookings"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-customers"] });
+      toast({ title: "Walk-in appointment added" });
+      setWalkinOpen(false);
+      setWiName(""); setWiPhone(""); setWiAge(""); setWiBarber(BARBER_OPTIONS[0]); setWiTime(""); setWiService("");
+    },
+    onError: (err: any) => toast({ title: "Error", description: err.message, variant: "destructive" }),
   });
 
   if (loading) {
@@ -182,9 +227,11 @@ export default function AdminDashboard() {
 
   const totalBookings = bookings.length;
   const pendingCount = bookings.filter((b: any) => b.status === "pending").length;
+  const acceptedCount = bookings.filter((b: any) => b.status === "accepted").length;
   const confirmedCount = bookings.filter((b: any) => b.status === "confirmed").length;
   const completedCount = bookings.filter((b: any) => b.status === "completed").length;
   const cancelledCount = bookings.filter((b: any) => b.status === "cancelled").length;
+  const rejectedCount = bookings.filter((b: any) => b.status === "rejected").length;
   const totalRevenue = bookings
     .filter((b: any) => b.status === "completed")
     .reduce((sum: number, b: any) => sum + (b.services?.price || 0), 0);
@@ -251,8 +298,10 @@ export default function AdminDashboard() {
   const filters: { label: string; value: StatusFilter }[] = [
     { label: "All", value: "all" },
     { label: "Pending", value: "pending" },
+    { label: "Accepted", value: "accepted" },
     { label: "Confirmed", value: "confirmed" },
     { label: "Completed", value: "completed" },
+    { label: "Rejected", value: "rejected" },
     { label: "Cancelled", value: "cancelled" },
   ];
 
@@ -352,6 +401,14 @@ export default function AdminDashboard() {
 
           {/* ── BOOKINGS TAB ── */}
           <TabsContent value="bookings" className="space-y-6">
+            {/* Walk-in button */}
+            <Button
+              onClick={() => setWalkinOpen(true)}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white font-label uppercase tracking-widest shadow-[0_0_12px_rgba(52,211,153,0.2)]"
+            >
+              <Plus className="h-4 w-4 mr-2" /> Add Walk-in
+            </Button>
+
             <div className="flex flex-col sm:flex-row gap-3">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -435,28 +492,52 @@ export default function AdminDashboard() {
                           {b.notes && (
                             <p className="text-xs text-muted-foreground mt-1">Notes: {b.notes}</p>
                           )}
+                          {b.status === "rejected" && (b as any).rejection_reason && (
+                            <div className="mt-2 flex items-start gap-2 bg-red-500/10 border border-red-500/20 rounded-md p-2">
+                              <AlertCircle className="h-3.5 w-3.5 text-red-400 mt-0.5 shrink-0" />
+                              <p className="text-xs text-red-400">
+                                <span className="font-label uppercase tracking-wider">Reason:</span>{" "}
+                                {(b as any).rejection_reason}
+                              </p>
+                            </div>
+                          )}
+                          {(b as any).is_walkin && (
+                            <Badge className="mt-1 bg-emerald-500/20 text-emerald-400 border-emerald-500/30 text-[10px]" variant="outline">Walk-in</Badge>
+                          )}
                         </div>
-                        <div className="flex gap-2 shrink-0">
+                        <div className="flex flex-col gap-2 shrink-0">
                           {b.status === "pending" && (
                             <Button
                               size="sm"
-                              onClick={() => statusMutation.mutate({ id: b.id, status: "confirmed" })}
+                              className="bg-cyan-600 hover:bg-cyan-700 text-white"
+                              onClick={() => statusMutation.mutate({ id: b.id, status: "accepted" })}
                               disabled={statusMutation.isPending}
                             >
-                              Confirm
+                              <CheckCircle className="h-3.5 w-3.5 mr-1" /> Accept
                             </Button>
                           )}
-                          {(b.status === "pending" || b.status === "confirmed") && (
+                          {b.status === "accepted" && (
                             <Button
                               size="sm"
                               variant="secondary"
                               onClick={() => statusMutation.mutate({ id: b.id, status: "completed" })}
                               disabled={statusMutation.isPending}
                             >
-                              Complete
+                              <CheckCircle className="h-3.5 w-3.5 mr-1" /> Complete
                             </Button>
                           )}
-                          {b.status !== "cancelled" && b.status !== "completed" && (
+                          {b.status === "pending" && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                              onClick={() => { setRejectId(b.id); setRejectReason(""); }}
+                              disabled={statusMutation.isPending}
+                            >
+                              <XCircle className="h-3.5 w-3.5 mr-1" /> Reject
+                            </Button>
+                          )}
+                          {b.status !== "cancelled" && b.status !== "completed" && b.status !== "rejected" && b.status !== "pending" && (
                             <Button
                               size="sm"
                               variant="ghost"
@@ -541,11 +622,11 @@ export default function AdminDashboard() {
                   <TableBody>
                     {isLoadingCustomers ? (
                       <TableRow>
-                        <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">Loading customers...</TableCell>
+                        <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">Loading customers...</TableCell>
                       </TableRow>
                     ) : filteredCustomers.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">No customers found.</TableCell>
+                        <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">No customers found.</TableCell>
                       </TableRow>
                     ) : (
                       filteredCustomers.map((c: any) => (
@@ -582,6 +663,111 @@ export default function AdminDashboard() {
 
         </Tabs>
       </main>
+
+      {/* ── REJECTION MODAL ── */}
+      <Dialog open={!!rejectId} onOpenChange={() => setRejectId(null)}>
+        <DialogContent className="bg-surface-container-highest ghost-border ambient-shadow max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="font-heading text-xl text-foreground">Reject Booking</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label className="text-muted-foreground font-label text-xs uppercase tracking-widest">Rejection Reason</Label>
+              <Textarea
+                value={rejectReason}
+                onChange={(e) => setRejectReason(e.target.value)}
+                placeholder="e.g. Fully booked at this time..."
+                className="bg-surface ghost-border focus:border-primary focus:ring-1 focus:ring-primary transition-all mt-2"
+              />
+            </div>
+            <div className="flex gap-2 justify-end">
+              <Button variant="ghost" size="sm" onClick={() => setRejectId(null)}>Cancel</Button>
+              <Button
+                size="sm"
+                className="bg-red-600 hover:bg-red-700 text-white"
+                disabled={!rejectReason.trim() || statusMutation.isPending}
+                onClick={() => {
+                  if (rejectId) {
+                    statusMutation.mutate({ id: rejectId, status: "rejected", rejectionReason: rejectReason.trim() });
+                    setRejectId(null);
+                  }
+                }}
+              >
+                <XCircle className="h-3.5 w-3.5 mr-1" /> Reject
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* ── WALK-IN MODAL ── */}
+      <Dialog open={walkinOpen} onOpenChange={setWalkinOpen}>
+        <DialogContent className="bg-surface-container-highest ghost-border ambient-shadow max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-heading text-2xl text-foreground">Add Walk-in Appointment</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={(e) => { e.preventDefault(); walkinMutation.mutate({ customer_name: wiName, customer_phone: wiPhone, customer_age: wiAge ? parseInt(wiAge) : undefined, barber: wiBarber, booking_time: wiTime, service_id: wiService, status: wiStatus }); }} className="space-y-4">
+            <div>
+              <Label className="text-muted-foreground font-label text-xs uppercase tracking-widest">Client Name</Label>
+              <Input value={wiName} onChange={(e) => setWiName(e.target.value)} required placeholder="Ahmed" className="bg-surface ghost-border focus:border-primary focus:ring-1 focus:ring-primary transition-all mt-2" />
+            </div>
+            <div>
+              <Label className="text-muted-foreground font-label text-xs uppercase tracking-widest">Phone</Label>
+              <Input type="tel" value={wiPhone} onChange={(e) => setWiPhone(e.target.value)} required placeholder="01XXXXXXXXX" className="bg-surface ghost-border focus:border-primary focus:ring-1 focus:ring-primary transition-all mt-2" />
+            </div>
+            <div>
+              <Label className="text-muted-foreground font-label text-xs uppercase tracking-widest">Age (optional)</Label>
+              <Input type="number" value={wiAge} onChange={(e) => setWiAge(e.target.value)} placeholder="25" min="1" max="120" className="bg-surface ghost-border focus:border-primary focus:ring-1 focus:ring-primary transition-all mt-2" />
+            </div>
+            <div>
+              <Label className="text-muted-foreground font-label text-xs uppercase tracking-widest">Barber</Label>
+              <Select value={wiBarber} onValueChange={setWiBarber}>
+                <SelectTrigger className="bg-surface ghost-border focus:border-primary focus:ring-1 focus:ring-primary transition-all mt-2"><SelectValue /></SelectTrigger>
+                <SelectContent className="bg-surface-container-high ghost-border">
+                  {BARBER_OPTIONS.map((name) => (
+                    <SelectItem key={name} value={name} className="hover:bg-surface-container focus:bg-surface-container focus:text-primary">{name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-muted-foreground font-label text-xs uppercase tracking-widest">Service</Label>
+              <Select value={wiService} onValueChange={setWiService} required>
+                <SelectTrigger className="bg-surface ghost-border focus:border-primary focus:ring-1 focus:ring-primary transition-all mt-2"><SelectValue placeholder="Select service" /></SelectTrigger>
+                <SelectContent className="bg-surface-container-high ghost-border">
+                  {services.map((s: any) => (
+                    <SelectItem key={s.id} value={s.id} className="hover:bg-surface-container focus:bg-surface-container focus:text-primary">{s.name} — {s.price} EGP</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-muted-foreground font-label text-xs uppercase tracking-widest">Time</Label>
+              <Select value={wiTime} onValueChange={setWiTime} required>
+                <SelectTrigger className="bg-surface ghost-border focus:border-primary focus:ring-1 focus:ring-primary transition-all mt-2"><SelectValue placeholder="Select time" /></SelectTrigger>
+                <SelectContent className="bg-surface-container-high ghost-border">
+                  {TIME_SLOTS.map((slot) => (
+                    <SelectItem key={slot} value={slot} className="hover:bg-surface-container focus:bg-surface-container focus:text-primary">{formatTime12h(slot)}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-muted-foreground font-label text-xs uppercase tracking-widest">Status</Label>
+              <Select value={wiStatus} onValueChange={(v) => setWiStatus(v as "accepted" | "completed")}>
+                <SelectTrigger className="bg-surface ghost-border focus:border-primary focus:ring-1 focus:ring-primary transition-all mt-2"><SelectValue /></SelectTrigger>
+                <SelectContent className="bg-surface-container-high ghost-border">
+                  <SelectItem value="accepted" className="hover:bg-surface-container focus:bg-surface-container focus:text-primary">Accepted (in progress)</SelectItem>
+                  <SelectItem value="completed" className="hover:bg-surface-container focus:bg-surface-container focus:text-primary">Completed (done)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <Button type="submit" className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-label uppercase tracking-widest" disabled={walkinMutation.isPending || !wiName || !wiPhone || !wiService || !wiTime}>
+              {walkinMutation.isPending ? "Adding..." : "Add Walk-in"}
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

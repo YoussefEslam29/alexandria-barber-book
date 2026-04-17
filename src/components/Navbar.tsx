@@ -15,7 +15,7 @@ interface NavbarProps {
   isBarber?: boolean;
 }
 
-export default function Navbar({ onBookClick, isBarber }: NavbarProps) {
+export default function Navbar({ onBookClick, onMyBookingsClick, isBarber }: NavbarProps) {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const { lang, setLang, t } = useLanguage();
@@ -46,6 +46,9 @@ export default function Navbar({ onBookClick, isBarber }: NavbarProps) {
               {t("adminDashboard")}
             </button>
           )}
+          <button onClick={onMyBookingsClick} className="text-muted-foreground hover:text-primary transition-colors text-sm font-label">
+            {t("trackMyBooking")}
+          </button>
           <Button
             onClick={onBookClick}
             size="sm"
@@ -82,6 +85,9 @@ export default function Navbar({ onBookClick, isBarber }: NavbarProps) {
               {t("adminDashboard")}
             </button>
           )}
+          <button onClick={() => { onMyBookingsClick(); setOpen(false); }} className="block text-muted-foreground hover:text-primary font-label text-sm w-full text-start">
+            {t("trackMyBooking")}
+          </button>
           <Button
             onClick={() => { onBookClick(); setOpen(false); }}
             size="sm"

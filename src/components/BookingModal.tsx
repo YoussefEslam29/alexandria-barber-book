@@ -57,17 +57,13 @@ export default function BookingModal({ open, onClose, selectedBarber }: BookingM
         ? " 🎉 You're close to your FREE 6th visit!"
         : "";
       toast({
-        title: t("booked"),
-        description: (t("appointmentConfirmed") || "Your appointment has been confirmed.") + visitMsg,
+        title: "✅ " + t("booked"),
+        description: (t("appointmentConfirmed") || "Your appointment request has been submitted.") + visitMsg,
       });
       queryClient.invalidateQueries({ queryKey: ["bookings"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-bookings"] });
       onClose();
       resetForm();
-
-      // Smooth scroll to contacts/about section after modal closes
-      setTimeout(() => {
-        document.querySelector("#about")?.scrollIntoView({ behavior: "smooth" });
-      }, 300);
     },
     onError: (err: any) => {
       toast({ title: t("bookingFailed"), description: err.message, variant: "destructive" });
