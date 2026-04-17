@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
-import { getProfile, getAllBookings, updateBookingStatus, getAllCustomers } from "@/lib/supabase-helpers";
+import { getProfile, getAllBookings, updateBookingStatus, getAllCustomers, getAllProfiles, getBookingsPerBarber } from "@/lib/supabase-helpers";
 import { formatTime12h } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -19,17 +20,19 @@ import {
   Clock,
   User,
   Phone,
-  Mail,
   Scissors,
   DollarSign,
   TrendingUp,
   CheckCircle,
-  XCircle,
   ArrowLeft,
   Search,
   LayoutDashboard,
   LogOut,
   Gift,
+  Users,
+  Crown,
+  BarChart2,
+  UserCheck,
 } from "lucide-react";
 
 const statusColors: Record<string, string> = {
@@ -143,6 +146,19 @@ export default function AdminDashboard() {
     enabled: isBarber,
   });
 
+  const { data: profiles = [] } = useQuery({
+    queryKey: ["admin-profiles"],
+    queryFn: getAllProfiles,
+    enabled: isBarber,
+  });
+
+  const { data: barberChartData = [] } = useQuery({
+    queryKey: ["admin-barber-chart"],
+    queryFn: getBookingsPerBarber,
+    enabled: isBarber,
+    refetchInterval: 30000,
+  });
+
   const statusMutation = useMutation({
     mutationFn: ({ id, status }: { id: string; status: string }) =>
       updateBookingStatus(id, status),
@@ -205,6 +221,31 @@ export default function AdminDashboard() {
     { label: "Loyalty (5+ visits)", value: loyaltyReady, icon: Gift, color: "text-pink-400" },
   ];
 
+  // ── Business Intelligence ──
+  const totalKings = profiles.length;
+  const revenueForecast = totalBookings * 150;
+  const topBarber = barberChartData[0]?.barber ?? "N/A";
+  const profilesWithAge = profiles.filter((p: any) => p.age != null && p.age > 0);
+  const avgAge = profilesWithAge.length
+    ? Math.round(profilesWithAge.reduce((s: number, p: any) => s + (p.age as number), 0) / profilesWithAge.length)
+    : null;
+
+  const biStats = [
+    { label: "Total Kings", value: totalKings, icon: Users, color: "text-cyan-400", glow: "shadow-[0_0_18px_rgba(0,219,231,0.25)]" },
+    { label: "Revenue Forecast", value: `${revenueForecast.toLocaleString()} EGP`, icon: DollarSign, color: "text-emerald-400", glow: "shadow-[0_0_18px_rgba(52,211,153,0.25)]" },
+    { label: "Top Barber", value: topBarber, icon: Crown, color: "text-yellow-400", glow: "shadow-[0_0_18px_rgba(250,204,21,0.25)]" },
+    { label: "Avg Client Age", value: avgAge != null ? `${avgAge} yrs` : "—", icon: UserCheck, color: "text-violet-400", glow: "shadow-[0_0_18px_rgba(167,139,250,0.25)]" },
+  ];
+
+  const getPersona = (profile: any): { label: string; cls: string } | null => {
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+    if (profile.created_at >= sevenDaysAgo) return { label: "New Recruit", cls: "bg-green-500/20 text-green-400 border-green-500/30" };
+    if (profile.age != null && profile.age < 25) return { label: "Young Elite", cls: "bg-cyan-500/20 text-cyan-400 border-cyan-500/30" };
+    if (profile.age != null && profile.age >= 40) return { label: "The Sovereign", cls: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30" };
+    return null;
+  };
+
+
   const filters: { label: string; value: StatusFilter }[] = [
     { label: "All", value: "all" },
     { label: "Pending", value: "pending" },
@@ -251,6 +292,54 @@ export default function AdminDashboard() {
               </CardContent>
             </Card>
           ))}
+        </div>
+
+        {/* ── Business Intelligence ── */}
+        <div>
+          <div className="flex items-center gap-2 mb-4">
+            <BarChart2 className="h-5 w-5 text-primary" />
+            <h2 className="font-heading text-lg text-foreground tracking-widest uppercase">Analytics Overview</h2>
+          </div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            {biStats.map((s) => (
+              <Card key={s.label} className={`bg-card border border-primary/30 ${s.glow}`}>
+                <CardContent className="p-5">
+                  <div className="flex items-center gap-2 mb-2">
+                    <s.icon className={`h-4 w-4 ${s.color}`} />
+                    <span className="text-xs font-label uppercase tracking-widest text-muted-foreground">{s.label}</span>
+                  </div>
+                  <p className={`text-2xl font-heading font-bold ${s.color}`}>{s.value}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {barberChartData.length > 0 && (
+            <Card className="bg-card border border-primary/20">
+              <CardHeader className="pb-2">
+                <CardTitle className="font-heading text-base text-foreground flex items-center gap-2">
+                  <Scissors className="h-4 w-4 text-primary" /> Appointments per Barber
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={200}>
+                  <BarChart data={barberChartData} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
+                    <XAxis dataKey="barber" tick={{ fill: "#9ca3af", fontSize: 12 }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fill: "#9ca3af", fontSize: 12 }} axisLine={false} tickLine={false} allowDecimals={false} />
+                    <Tooltip
+                      contentStyle={{ background: "#1a1a1a", border: "1px solid rgba(0,219,231,0.3)", borderRadius: "8px", color: "#e5e7eb" }}
+                      cursor={{ fill: "rgba(0,219,231,0.05)" }}
+                    />
+                    <Bar dataKey="count" radius={[4, 4, 0, 0]}>
+                      {barberChartData.map((_, i) => (
+                        <Cell key={i} fill={i === 0 ? "rgba(0,219,231,0.8)" : "rgba(0,219,231,0.35)"} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          )}
         </div>
 
         <Tabs defaultValue="bookings" className="w-full">
@@ -381,6 +470,43 @@ export default function AdminDashboard() {
 
           {/* ── CUSTOMERS & LOYALTY TAB ── */}
           <TabsContent value="customers" className="space-y-6">
+
+            {/* Client Insights (from profiles) */}
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <UserCheck className="h-5 w-5 text-primary" />
+                <h2 className="font-heading text-lg text-foreground tracking-widest uppercase">Client Insights</h2>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {profiles.length === 0 ? (
+                  <p className="text-muted-foreground text-sm col-span-3">No registered users yet.</p>
+                ) : (
+                  profiles.map((p: any) => {
+                    const persona = getPersona(p);
+                    return (
+                      <Card key={p.id} className="bg-card border-border hover:border-primary/30 transition-colors">
+                        <CardContent className="p-4 flex items-center justify-between gap-3">
+                          <div className="min-w-0">
+                            <p className="font-heading text-foreground truncate">{p.full_name || "Unknown"}</p>
+                            <p className="text-xs text-muted-foreground">{p.email || p.phone_number || "—"}</p>
+                            {p.age && <p className="text-xs text-muted-foreground">Age: {p.age}</p>}
+                          </div>
+                          {persona && (
+                            <Badge className={`shrink-0 text-xs ${persona.cls}`} variant="outline">
+                              {persona.label}
+                            </Badge>
+                          )}
+                        </CardContent>
+                      </Card>
+                    );
+                  })
+                )}
+              </div>
+            </div>
+
+            <div className="h-px bg-border" />
+
+            {/* Loyalty customers table */}
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
@@ -390,7 +516,7 @@ export default function AdminDashboard() {
                 className="pl-9 bg-card border-border"
               />
             </div>
-            
+
             <Card className="bg-card border-border">
               <CardContent className="p-0 overflow-x-auto">
                 <Table>
@@ -443,6 +569,7 @@ export default function AdminDashboard() {
               </CardContent>
             </Card>
           </TabsContent>
+
         </Tabs>
       </main>
     </div>
