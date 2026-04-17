@@ -85,6 +85,7 @@ export const translations = {
   booked: { en: "Booked!", ar: "تم الحجز!" },
   appointmentConfirmed: { en: "Your appointment has been confirmed.", ar: "تم تأكيد موعدك." },
   bookingFailed: { en: "Booking failed", ar: "فشل الحجز" },
+  exploreServices: { en: "Explore Our Services", ar: "استكشف خدماتنا" },
 
   // My Bookings
   noBookings: { en: "No bookings yet.", ar: "لا توجد حجوزات بعد." },
