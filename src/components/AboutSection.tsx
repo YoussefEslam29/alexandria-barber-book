@@ -1,4 +1,4 @@
-import { MapPin, Phone, Clock, Instagram } from "lucide-react";
+import { MapPin, Phone, Clock, Instagram, Facebook } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
 
 export default function AboutSection() {
@@ -29,6 +29,7 @@ export default function AboutSection() {
                 </a>
                 <div className="flex gap-4 mt-4">
                   <a href="https://www.instagram.com/kral.saloon/" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors"><Instagram className="h-5 w-5" /></a>
+                  <a href="https://www.facebook.com/KRALSALON1" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors"><Facebook className="h-5 w-5" /></a>
                 </div>
               </div>
             </div>
