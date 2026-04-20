@@ -59,6 +59,7 @@ export async function createPublicBooking(params: {
   booking_time: string;
   barber: string;
   notes?: string;
+  is_home_service?: boolean;
 }) {
   // Find or create customer first (for visit tracking)
   const customer = await findOrCreateCustomer(
@@ -82,6 +83,7 @@ export async function createPublicBooking(params: {
       booking_time: params.booking_time,
       barber: params.barber,
       notes: params.notes,
+      is_home_service: params.is_home_service ?? false,
       status: "pending",
     } as any)
     .select()
@@ -103,6 +105,7 @@ export async function createWalkinBooking(params: {
   booking_time: string;
   service_id: string;
   status: "accepted" | "completed";
+  is_home_service?: boolean;
 }) {
   const todayStr = new Date().toISOString().split("T")[0];
 
@@ -127,6 +130,7 @@ export async function createWalkinBooking(params: {
       barber: params.barber,
       status: params.status,
       is_walkin: true,
+      is_home_service: params.is_home_service ?? false,
     } as any)
     .select()
     .single();

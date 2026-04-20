@@ -142,6 +142,17 @@ export const translations = {
     en: "Kral Salon — Alexandria, Egypt.",
     ar: "كرال صالون — الإسكندرية، مصر.",
   },
+
+  // Premium Service
+  premiumService: { en: "Premium Service", ar: "خدمة مميزة" },
+  groomingAtHome: { en: "Grooming at Home", ar: "حلاقة في المنزل" },
+  premiumServiceTitle: { en: "The Sovereign Mobile Experience", ar: "تجربة السيادة المتنقلة" },
+  premiumServiceBio: {
+    en: "Exclusivity delivered to your doorstep. We bring the full industrial sanctuary setup to your home or office. Experience the pinnacle of grooming without the commute.",
+    ar: "التميز يصل إلى باب منزلك. نحضر التجهيزات الصناعية الكاملة إلى منزلك أو مكتبك. استمتع بقمة الحلاقة دون الحاجة للتنقل.",
+  },
+  requestHomeService: { en: "Request Home Service", ar: "طلب خدمة منزلية" },
+  premiumGroomingAtHome: { en: "Premium Grooming at Home", ar: "حلاقة مميزة في المنزل" },
 } as const;
 
 export type TranslationKey = keyof typeof translations;

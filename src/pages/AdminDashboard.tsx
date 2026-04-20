@@ -128,6 +128,7 @@ export default function AdminDashboard() {
   const [wiTime, setWiTime] = useState("");
   const [wiService, setWiService] = useState("");
   const [wiStatus, setWiStatus] = useState<"accepted" | "completed">("accepted");
+  const [wiHomeService, setWiHomeService] = useState(false);
   // Rejection modal
   const [rejectId, setRejectId] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState("");
@@ -208,7 +209,7 @@ export default function AdminDashboard() {
       queryClient.invalidateQueries({ queryKey: ["admin-customers"] });
       toast({ title: "Walk-in appointment added" });
       setWalkinOpen(false);
-      setWiName(""); setWiPhone(""); setWiAge(""); setWiBarber(BARBER_OPTIONS[0]); setWiTime(""); setWiService("");
+      setWiName(""); setWiPhone(""); setWiAge(""); setWiBarber(BARBER_OPTIONS[0]); setWiTime(""); setWiService(""); setWiHomeService(false);
     },
     onError: (err: any) => toast({ title: "Error", description: err.message, variant: "destructive" }),
   });
@@ -455,6 +456,11 @@ export default function AdminDashboard() {
                             <Badge className={statusColors[b.status] || ""} variant="outline">
                               {b.status}
                             </Badge>
+                            {b.is_home_service && (
+                              <Badge className="bg-[#D4AF37]/20 text-[#D4AF37] border-[#D4AF37]/50 shadow-[0_0_10px_rgba(212,175,55,0.2)]" variant="outline">
+                                Premium Home
+                              </Badge>
+                            )}
                           </div>
                           <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
                             <span className="flex items-center gap-1">
@@ -706,7 +712,7 @@ export default function AdminDashboard() {
           <DialogHeader>
             <DialogTitle className="font-heading text-2xl text-foreground">Add Walk-in Appointment</DialogTitle>
           </DialogHeader>
-          <form onSubmit={(e) => { e.preventDefault(); walkinMutation.mutate({ customer_name: wiName, customer_phone: wiPhone, customer_age: wiAge ? parseInt(wiAge) : undefined, barber: wiBarber, booking_time: wiTime, service_id: wiService, status: wiStatus }); }} className="space-y-4">
+          <form onSubmit={(e) => { e.preventDefault(); walkinMutation.mutate({ customer_name: wiName, customer_phone: wiPhone, customer_age: wiAge ? parseInt(wiAge) : undefined, barber: wiBarber, booking_time: wiTime, service_id: wiService, status: wiStatus, is_home_service: wiHomeService }); }} className="space-y-4">
             <div>
               <Label className="text-muted-foreground font-label text-xs uppercase tracking-widest">Client Name</Label>
               <Input value={wiName} onChange={(e) => setWiName(e.target.value)} required placeholder="Ahmed" className="bg-surface ghost-border focus:border-primary focus:ring-1 focus:ring-primary transition-all mt-2" />
@@ -761,6 +767,18 @@ export default function AdminDashboard() {
                   <SelectItem value="completed" className="hover:bg-surface-container focus:bg-surface-container focus:text-primary">Completed (done)</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+            <div className="flex items-center space-x-2 pt-2">
+              <input 
+                type="checkbox" 
+                id="wi-home-service" 
+                checked={wiHomeService} 
+                onChange={(e) => setWiHomeService(e.target.checked)}
+                className="rounded border-surface-container-high text-[#D4AF37] focus:ring-[#D4AF37] h-4 w-4 bg-surface"
+              />
+              <Label htmlFor="wi-home-service" className="text-sm font-label text-[#D4AF37] tracking-wider cursor-pointer">
+                Premium Grooming at Home
+              </Label>
             </div>
             <Button type="submit" className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-label uppercase tracking-widest" disabled={walkinMutation.isPending || !wiName || !wiPhone || !wiService || !wiTime}>
               {walkinMutation.isPending ? "Adding..." : "Add Walk-in"}

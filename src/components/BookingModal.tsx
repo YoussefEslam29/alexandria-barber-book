@@ -24,9 +24,10 @@ interface BookingModalProps {
   open: boolean;
   onClose: () => void;
   selectedBarber?: string;
+  isHomeServiceDefault?: boolean;
 }
 
-export default function BookingModal({ open, onClose, selectedBarber }: BookingModalProps) {
+export default function BookingModal({ open, onClose, selectedBarber, isHomeServiceDefault = false }: BookingModalProps) {
   const [fullName, setFullName] = useState("");
   const [age, setAge] = useState("");
   const [phone, setPhone] = useState("");
@@ -36,6 +37,7 @@ export default function BookingModal({ open, onClose, selectedBarber }: BookingM
   const [time, setTime] = useState("");
   const [notes, setNotes] = useState("");
   const [barber, setBarber] = useState(selectedBarber || BARBER_OPTIONS[0]);
+  const [isHomeService, setIsHomeService] = useState(isHomeServiceDefault);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { lang, t } = useLanguage();
@@ -43,6 +45,9 @@ export default function BookingModal({ open, onClose, selectedBarber }: BookingM
   // Sync when selectedBarber prop changes (from barber card click)
   if (selectedBarber && selectedBarber !== barber && open) {
     setBarber(selectedBarber);
+  }
+  if (isHomeServiceDefault !== isHomeService && open) {
+    setIsHomeService(isHomeServiceDefault);
   }
 
   const { data: services } = useQuery({
@@ -80,6 +85,7 @@ export default function BookingModal({ open, onClose, selectedBarber }: BookingM
     setTime("");
     setNotes("");
     setBarber(BARBER_OPTIONS[0]);
+    setIsHomeService(false);
   };
 
   const today = new Date().toISOString().split("T")[0];
@@ -96,7 +102,23 @@ export default function BookingModal({ open, onClose, selectedBarber }: BookingM
       booking_time: time,
       barber: barber !== BARBER_OPTIONS[0] ? barber : "",
       notes: notes || undefined,
+      is_home_service: isHomeService,
     });
+  };
+
+  const handleServiceChange = (val: string) => {
+    const selectedService = services?.find(s => s.id === val);
+    const isKidsService = selectedService?.name.toLowerCase().includes("kid") || selectedService?.name_ar?.includes("أطفال");
+    
+    if (isKidsService && age && parseInt(age) > 12) {
+      toast({
+        title: "Not Allowed",
+        description: "The Kids Service is strictly for those aged 12 and under. Please select a standard or premium cut.",
+        variant: "destructive"
+      });
+      return;
+    }
+    setServiceId(val);
   };
 
   const inputClass = "bg-surface ghost-border focus:border-primary focus:ring-1 focus:ring-primary transition-all mt-2";
@@ -176,7 +198,7 @@ export default function BookingModal({ open, onClose, selectedBarber }: BookingM
           {/* Service */}
           <div>
             <Label className="text-muted-foreground font-label text-xs uppercase tracking-widest">{t("service")}</Label>
-            <Select value={serviceId} onValueChange={setServiceId} required>
+            <Select value={serviceId} onValueChange={handleServiceChange} required>
               <SelectTrigger className={inputClass}>
                 <SelectValue placeholder={t("selectService")} />
               </SelectTrigger>
@@ -217,6 +239,20 @@ export default function BookingModal({ open, onClose, selectedBarber }: BookingM
           <div>
             <Label className="text-muted-foreground font-label text-xs uppercase tracking-widest">{t("notesOptional")}</Label>
             <Textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder={t("notesPlaceholder")} className={inputClass} />
+          </div>
+
+          {/* Premium Home Service Toggle */}
+          <div className="flex items-center space-x-2 py-2">
+            <input 
+              type="checkbox" 
+              id="home-service" 
+              checked={isHomeService} 
+              onChange={(e) => setIsHomeService(e.target.checked)}
+              className="rounded border-surface-container-high text-[#D4AF37] focus:ring-[#D4AF37] h-4 w-4 bg-surface"
+            />
+            <Label htmlFor="home-service" className="text-sm font-label text-[#D4AF37] tracking-wider cursor-pointer">
+              {t("premiumGroomingAtHome")}
+            </Label>
           </div>
 
           <Button

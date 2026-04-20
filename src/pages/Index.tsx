@@ -10,14 +10,17 @@ import WhatsAppButton from "@/components/WhatsAppButton";
 import BarbersSection from "@/components/BarbersSection";
 import MasterpieceSection from "@/components/MasterpieceSection";
 import ExperienceSection from "@/components/ExperienceSection";
+import PremiumServiceSection from "@/components/PremiumServiceSection";
 
 export default function Index() {
   const [bookOpen, setBookOpen] = useState(false);
   const [trackOpen, setTrackOpen] = useState(false);
   const [selectedBarber, setSelectedBarber] = useState<string | undefined>(undefined);
+  const [isHomeService, setIsHomeService] = useState(false);
 
-  const handleBookClick = (barberName?: string) => {
+  const handleBookClick = (barberName?: string, homeService = false) => {
     setSelectedBarber(barberName);
+    setIsHomeService(homeService);
     setBookOpen(true);
   };
 
@@ -39,6 +42,7 @@ export default function Index() {
       <HeroSection onBookClick={() => handleBookClick()} />
       <ExperienceSection />
       <ServicesSection />
+      <PremiumServiceSection onBookPremium={() => handleBookClick(undefined, true)} />
       <BarbersSection onBookWithBarber={handleBookWithBarber} />
       <MasterpieceSection />
       <AboutSection />
@@ -49,6 +53,7 @@ export default function Index() {
         open={bookOpen}
         onClose={() => setBookOpen(false)}
         selectedBarber={selectedBarber}
+        isHomeServiceDefault={isHomeService}
       />
 
       <BookingTracker
