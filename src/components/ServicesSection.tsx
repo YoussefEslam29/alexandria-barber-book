@@ -24,7 +24,15 @@ export default function ServicesSection() {
         {isLoading ? (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="bg-surface-container-low rounded-md p-8 animate-pulse h-48 ghost-border" />
+              <div key={i} className="bg-surface-container-low ghost-border rounded-md p-8 animate-pulse h-48 flex flex-col justify-between">
+                <div className="flex justify-between w-full mb-4">
+                  <div className="h-8 bg-surface-container-high rounded w-1/3"></div>
+                  <div className="h-8 bg-surface-container-high rounded w-1/4"></div>
+                </div>
+                <div className="h-4 bg-surface-container-high rounded w-full mb-2"></div>
+                <div className="h-4 bg-surface-container-high rounded w-4/5 mb-6"></div>
+                <div className="h-4 bg-surface-container-high rounded w-16 mt-auto"></div>
+              </div>
             ))}
           </div>
         ) : (

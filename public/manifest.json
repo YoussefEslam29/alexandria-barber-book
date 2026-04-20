@@ -1,0 +1,16 @@
+{
+  "name": "Kral Salon | Premium Barbering",
+  "short_name": "Kral Salon",
+  "description": "Premium Barbershop in Alexandria offering classic cuts, beard trims, hot towel shaves, and premium home services.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#111416",
+  "theme_color": "#111416",
+  "icons": [
+    {
+      "src": "/kral-logo.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png"
+    }
+  ]
+}

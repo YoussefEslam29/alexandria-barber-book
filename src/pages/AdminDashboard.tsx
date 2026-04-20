@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
-import { getProfile, getAllBookings, updateBookingStatus, getAllCustomers, getAllProfiles, getBookingsPerBarber, getServices, createWalkinBooking } from "@/lib/supabase-helpers";
+import { getProfile, getAllBookings, updateBookingStatus, getAllCustomers, getAllProfiles, getBookingsPerBarber, getServices, createWalkinBooking, HOME_SERVICE_FEE } from "@/lib/supabase-helpers";
 import { formatTime12h } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
@@ -39,6 +39,7 @@ import {
   XCircle,
   Plus,
   AlertCircle,
+  Car,
 } from "lucide-react";
 
 const BARBER_OPTIONS = ["Ahmed Kral", "Omar Khalil", "Youssef Adel"];
@@ -235,7 +236,7 @@ export default function AdminDashboard() {
   const rejectedCount = bookings.filter((b: any) => b.status === "rejected").length;
   const totalRevenue = bookings
     .filter((b: any) => b.status === "completed")
-    .reduce((sum: number, b: any) => sum + (b.services?.price || 0), 0);
+    .reduce((sum: number, b: any) => sum + (b.services?.price || 0) + (b.is_home_service ? HOME_SERVICE_FEE : 0), 0);
 
   const todayStr = new Date().toISOString().split("T")[0];
   const todayBookings = bookings.filter((b: any) => b.booking_date === todayStr).length;
@@ -435,11 +436,28 @@ export default function AdminDashboard() {
             </div>
 
             {isLoading ? (
-              <p className="text-muted-foreground text-center py-12">Loading bookings...</p>
+              <div className="space-y-3">
+                {[...Array(5)].map((_, i) => (
+                  <Card key={i} className="bg-card border-border animate-pulse mb-3">
+                    <CardContent className="p-4 flex flex-col sm:flex-row gap-3">
+                      <div className="flex-1 space-y-3">
+                        <div className="flex gap-2"><div className="h-5 w-32 bg-muted rounded"></div><div className="h-5 w-16 bg-muted rounded"></div></div>
+                        <div className="flex gap-3"><div className="h-4 w-24 bg-muted rounded"></div><div className="h-4 w-24 bg-muted rounded"></div></div>
+                      </div>
+                      <div className="flex flex-col gap-2 shrink-0">
+                        <div className="h-8 w-20 bg-muted rounded"></div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
             ) : !filtered.length ? (
-              <Card className="bg-card border-border">
-                <CardContent className="py-12 text-center">
-                  <p className="text-muted-foreground">No bookings found.</p>
+              <Card className="bg-card border-border border-0 shadow-none">
+                <CardContent className="py-16 text-center flex flex-col items-center justify-center">
+                  <CalendarDays className="h-12 w-12 text-muted-foreground/30 mb-4" />
+                  <h3 className="font-heading text-xl text-foreground mb-2">Your chair is waiting</h3>
+                  <p className="text-muted-foreground mb-4 text-sm max-w-sm">There are no appointments found for the selected criteria. Manage your schedule or add a new walk-in.</p>
+                  <Button onClick={() => setWalkinOpen(true)} className="bg-primary-gradient text-primary-foreground font-label uppercase tracking-widest mt-2"><Plus className="h-4 w-4 mr-2"/> Add Walk-in</Button>
                 </CardContent>
               </Card>
             ) : (
@@ -458,7 +476,7 @@ export default function AdminDashboard() {
                             </Badge>
                             {b.is_home_service && (
                               <Badge className="bg-[#D4AF37]/20 text-[#D4AF37] border-[#D4AF37]/50 shadow-[0_0_10px_rgba(212,175,55,0.2)]" variant="outline">
-                                Premium Home
+                                <Car className="h-3 w-3 mr-1" /> Mobile
                               </Badge>
                             )}
                           </div>
@@ -492,7 +510,7 @@ export default function AdminDashboard() {
                               {formatTime12h(b.booking_time)}
                             </span>
                             <span className="text-primary font-medium">
-                              {b.services?.price} EGP
+                              {b.services?.price + (b.is_home_service ? HOME_SERVICE_FEE : 0)} EGP
                             </span>
                           </div>
                           {b.notes && (
@@ -612,7 +630,7 @@ export default function AdminDashboard() {
               />
             </div>
 
-            <Card className="bg-card border-border">
+            <Card className="bg-card border-border hidden md:block">
               <CardContent className="p-0 overflow-x-auto">
                 <Table>
                   <TableHeader className="bg-muted/50">
@@ -628,11 +646,25 @@ export default function AdminDashboard() {
                   <TableBody>
                     {isLoadingCustomers ? (
                       <TableRow>
-                        <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">Loading customers...</TableCell>
+                        <TableCell colSpan={6} className="p-4">
+                          <div className="space-y-3">
+                            {[...Array(3)].map((_, i) => (
+                              <div key={i} className="h-12 bg-muted rounded animate-pulse" />
+                            ))}
+                          </div>
+                        </TableCell>
                       </TableRow>
                     ) : filteredCustomers.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">No customers found.</TableCell>
+                        <TableCell colSpan={6} className="p-0">
+                          <Card className="bg-card border-border border-0 shadow-none">
+                            <CardContent className="py-12 text-center flex flex-col items-center justify-center">
+                              <Crown className="h-12 w-12 text-muted-foreground/30 mb-4" />
+                              <h3 className="font-heading text-xl text-foreground mb-2">No Kings found</h3>
+                              <p className="text-muted-foreground mb-4 text-sm max-w-sm">There are no registered users matching your search criteria. Build your empire by inviting more clients.</p>
+                            </CardContent>
+                          </Card>
+                        </TableCell>
                       </TableRow>
                     ) : (
                       filteredCustomers.map((c: any) => (
@@ -665,6 +697,58 @@ export default function AdminDashboard() {
                 </Table>
               </CardContent>
             </Card>
+
+            <div className="grid grid-cols-1 gap-4 md:hidden">
+              {isLoadingCustomers ? (
+                [...Array(3)].map((_, i) => (
+                  <Card key={i} className="bg-card border-border animate-pulse">
+                    <CardContent className="p-4 space-y-3">
+                      <div className="h-5 w-32 bg-muted rounded" />
+                      <div className="h-4 w-24 bg-muted rounded" />
+                      <div className="h-4 w-40 bg-muted rounded" />
+                    </CardContent>
+                  </Card>
+                ))
+              ) : filteredCustomers.length === 0 ? (
+                <Card className="bg-card border-border shadow-none">
+                  <CardContent className="py-12 text-center flex flex-col items-center justify-center">
+                    <Crown className="h-12 w-12 text-muted-foreground/30 mb-4" />
+                    <h3 className="font-heading text-xl text-foreground mb-2">No Kings found</h3>
+                    <p className="text-muted-foreground text-sm">There are no registered users matching your search criteria.</p>
+                  </CardContent>
+                </Card>
+              ) : (
+                filteredCustomers.map((c: any) => (
+                  <Card key={c.id} className="bg-card border-border">
+                    <CardContent className="p-4 flex flex-col gap-2">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h4 className="font-heading text-foreground font-semibold">{c.full_name || "Unknown"}</h4>
+                          <p className="text-xs text-muted-foreground">{c.phone || "-"}</p>
+                          <p className="text-xs text-muted-foreground">{c.email || "-"}</p>
+                          {c.age && <p className="text-xs text-muted-foreground mt-1">Age: {c.age}</p>}
+                        </div>
+                        <div className="text-right flex flex-col items-end gap-2">
+                          <Badge variant="outline" className={`font-heading ${c.visit_count >= 5 ? "border-primary text-primary" : "border-border"}`}>
+                            {c.visit_count} visits
+                          </Badge>
+                          {c.visit_count >= 5 ? (
+                            <Badge className="bg-primary/20 text-primary border-primary/30 text-[10px]" variant="outline">
+                              <Gift className="h-2.5 w-2.5 mr-1" />
+                              Free 6th Visit!
+                            </Badge>
+                          ) : (
+                            <span className="text-[10px] text-muted-foreground">
+                              {5 - c.visit_count} visits to go
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </div>
           </TabsContent>
 
         </Tabs>

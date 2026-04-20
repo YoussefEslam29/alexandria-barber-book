@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "@/hooks/useAuth";
+import { getProfile } from "@/lib/supabase-helpers";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import ServicesSection from "@/components/ServicesSection";
@@ -13,6 +16,13 @@ import ExperienceSection from "@/components/ExperienceSection";
 import PremiumServiceSection from "@/components/PremiumServiceSection";
 
 export default function Index() {
+  const { user, signOut } = useAuth();
+  const { data: profile } = useQuery({
+    queryKey: ["profile", user?.id],
+    queryFn: () => getProfile(user!.id),
+    enabled: !!user,
+  });
+
   const [bookOpen, setBookOpen] = useState(false);
   const [trackOpen, setTrackOpen] = useState(false);
   const [selectedBarber, setSelectedBarber] = useState<string | undefined>(undefined);
@@ -31,13 +41,13 @@ export default function Index() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar
-        user={null}
-        onSignOut={() => {}}
+        user={user}
+        onSignOut={signOut}
         onAuthClick={() => {}}
         onBookClick={() => handleBookClick()}
         onMyBookingsClick={() => setTrackOpen(true)}
         onBarberClick={() => {}}
-        isBarber={false}
+        isBarber={profile?.is_barber === true}
       />
       <HeroSection onBookClick={() => handleBookClick()} />
       <ExperienceSection />

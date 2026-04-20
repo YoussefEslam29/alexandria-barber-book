@@ -1,5 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 
+export const HOME_SERVICE_FEE = 200;
+
 // ───────────────────────────────────────────────
 // Services
 // ───────────────────────────────────────────────

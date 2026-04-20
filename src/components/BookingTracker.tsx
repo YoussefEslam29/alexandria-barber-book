@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { getBookingsByPhone } from "@/lib/supabase-helpers";
+import { getBookingsByPhone, updateBookingStatus, HOME_SERVICE_FEE } from "@/lib/supabase-helpers";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { formatTime12h } from "@/lib/utils";
 import { CalendarDays, Clock, Search, Scissors, AlertCircle } from "lucide-react";
@@ -33,6 +33,14 @@ export default function BookingTracker({ open, onClose }: BookingTrackerProps) {
     queryKey: ["track-bookings", searchPhone],
     queryFn: () => getBookingsByPhone(searchPhone),
     enabled: !!searchPhone,
+  });
+
+  const queryClient = useQueryClient();
+  const cancelMutation = useMutation({
+    mutationFn: (id: string) => updateBookingStatus(id, "cancelled"),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["track-bookings"] });
+    },
   });
 
   const handleSearch = (e: React.FormEvent) => {
@@ -76,7 +84,12 @@ export default function BookingTracker({ open, onClose }: BookingTrackerProps) {
         )}
 
         {isFetched && !isLoading && (!bookings || bookings.length === 0) && (
-          <p className="text-muted-foreground text-center py-6 text-sm">{t("noAppointmentsFound")}</p>
+          <div className="py-12 flex flex-col items-center justify-center text-center">
+            <Scissors className="h-12 w-12 text-muted-foreground/30 mb-4" />
+            <h3 className="font-heading text-xl text-foreground mb-2">{t("noAppointmentsFound") || "No Kings found"}</h3>
+            <p className="text-muted-foreground mb-4 text-sm max-w-sm">We couldn't find any appointments linked to this number.</p>
+            <Button onClick={onClose} className="bg-primary-gradient text-primary-foreground font-label uppercase tracking-widest mt-2">Book Now</Button>
+          </div>
         )}
 
         {bookings && bookings.length > 0 && (
@@ -96,7 +109,7 @@ export default function BookingTracker({ open, onClose }: BookingTrackerProps) {
                     <span className="flex items-center gap-1"><CalendarDays className="h-3 w-3" />{b.booking_date}</span>
                     <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{formatTime12h(b.booking_time)}</span>
                     {b.barber && <span className="flex items-center gap-1"><Scissors className="h-3 w-3" />{b.barber}</span>}
-                    <span className="text-primary font-medium">{(b as any).services?.price} EGP</span>
+                    <span className="text-primary font-medium">{(b as any).services?.price + ((b as any).is_home_service ? HOME_SERVICE_FEE : 0)} EGP</span>
                   </div>
 
                   {/* Rejection reason */}
@@ -124,6 +137,19 @@ export default function BookingTracker({ open, onClose }: BookingTrackerProps) {
                       <div className="h-2 w-2 rounded-full bg-cyan-400 shadow-[0_0_6px_rgba(0,219,231,0.5)]" />
                       <span className="text-xs text-cyan-400 font-label">{t("statusAccepted")}</span>
                     </div>
+                  )}
+
+                  {/* Cancel Button */}
+                  {(b.status === "pending" || b.status === "accepted") && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="mt-3 w-full border-red-500/50 text-red-400 hover:bg-red-500/10 hover:text-red-400 font-label tracking-widest text-xs h-8"
+                      onClick={() => cancelMutation.mutate(b.id)}
+                      disabled={cancelMutation.isPending}
+                    >
+                      {t("cancelAppointment") || "Cancel"}
+                    </Button>
                   )}
                 </div>
               );

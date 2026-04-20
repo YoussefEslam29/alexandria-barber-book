@@ -3,23 +3,59 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- TODO: Set the document title to the name of your application -->
-    <title>Kral Salon – Premium Barbershop in Alexandria, Egypt</title>
-    <meta name="description" content="Book your haircut at Kral Salon, a premium barbershop in Alexandria, Egypt. Classic cuts, beard trims, and hot towel shaves." />
+    <meta name="theme-color" content="#111416" />
+    
+    <title>Kral Salon | The Sovereign Standard.</title>
+    <meta name="description" content="Experience the pinnacle of grooming at Kral Salon, Alexandria's premier barbershop. Offering classic cuts, beard trims, hot towel shaves, and premium home services." />
     <meta name="author" content="Kral Salon" />
 
-    <meta property="og:title" content="Kral Salon – Premium Barbershop in Alexandria" />
-    <meta property="og:description" content="Lovable Generated Project" />
+    <!-- Open Graph tags -->
+    <meta property="og:title" content="Kral Salon | Premium Barbering in Alexandria" />
+    <meta property="og:description" content="Experience the pinnacle of grooming at Kral Salon, Alexandria's premier barbershop. Classic cuts, beard trims, and premium home services." />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    <meta property="og:image" content="/kral-logo.png" />
+    <meta property="og:url" content="https://kralsalon.com" />
 
+    <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@Lovable" />
-    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    <meta name="twitter:title" content="Kral Salon | Premium Barbering in Alexandria" />
+    <meta name="twitter:description" content="Experience the pinnacle of grooming at Kral Salon. Book your appointment today." />
+    <meta name="twitter:image" content="/kral-logo.png" />
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+
+    <!-- JSON-LD LocalBusiness Schema -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "LocalBusiness",
+        "name": "Kral Salon",
+        "image": "https://kralsalon.com/kral-logo.png",
+        "url": "https://kralsalon.com",
+        "telephone": "+201030355625",
+        "priceRange": "$$",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Alexandria",
+          "addressLocality": "Alexandria",
+          "addressCountry": "EG"
+        },
+        "description": "Premium Barbershop in Alexandria offering classic cuts, beard trims, hot towel shaves, and premium home services."
+      }
+    </script>
   </head>
 
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(console.error);
+        });
+      }
+    </script>
   </body>
 </html>
