@@ -2,9 +2,9 @@ export type Lang = "en" | "ar";
 
 export const translations = {
   // Navbar
-  services: { en: "Services", ar: "الخدمات" },
-  barbers: { en: "Barbers", ar: "الحلاقون" },
-  masterpiece: { en: "Masterpiece", ar: "المحفوظات" },
+  services: { en: "Our Services", ar: "خدمتنا" },
+  barbers: { en: "The Barbers", ar: "الحلاقون" },
+  masterpiece: { en: "Masterpiece", ar: "النموذج" },
   about: { en: "About", ar: "من نحن" },
   myBookings: { en: "My Bookings", ar: "حجوزاتي" },
   adminDashboard: { en: "Admin Dashboard", ar: "لوحة التحكم" },
@@ -30,11 +30,14 @@ export const translations = {
 
   // Services
   whatWeOffer: { en: "What We Offer", ar: "ما نقدمه" },
-  ourServices: { en: "Our Services", ar: "خدماتنا" },
+  ourServices: { en: "Our Services", ar: "خدمتنا" },
   min: { en: "min", ar: "دقيقة" },
 
   // About
   aboutUs: { en: "About Us", ar: "من نحن" },
+  waitingForYou: { en: "We are waiting for you", ar: "نحن في انتظارك" },
+  exclusiveExperience: { en: "An Exclusive Experience", ar: "تجربة حصرية" },
+  exclusive: { en: "Exclusive", ar: "حصرية" },
   aboutDescription: {
     en: "Located in Alexandria, we bring together traditional barbering craftsmanship with modern grooming techniques. Every visit is an experience — from the hot towel to the final touch.",
     ar: "يقع في الإسكندرية، نجمع بين حرفية الحلاقة التقليدية وتقنيات العناية الحديثة. كل زيارة هي تجربة — من المنشفة الساخنة إلى اللمسة الأخيرة.",
@@ -101,6 +104,7 @@ export const translations = {
   accept: { en: "Accept", ar: "قبول" },
   complete: { en: "Complete", ar: "إكمال" },
   walkIn: { en: "Walk-in", ar: "حضور مباشر" },
+  walkInAr: { en: "Walk-in", ar: "حضور مباشر" },
   addWalkin: { en: "+ Add Walk-in", ar: "+ إضافة حضور مباشر" },
   addWalkinTitle: { en: "Add Walk-in Appointment", ar: "إضافة موعد حضور مباشر" },
   trackMyBooking: { en: "Track My Booking", ar: "تتبع حجزي" },
@@ -146,6 +150,27 @@ export const translations = {
   // Premium Service
   premiumService: { en: "Premium Service", ar: "خدمة مميزة" },
   groomingAtHome: { en: "Grooming at Home", ar: "حلاقة في المنزل" },
+  mobileSanctuary: { en: "The Mobile Sanctuary", ar: "الملاذ المتنقل" },
+  mobileSanctuaryDesc: {
+    en: "Experience the pinnacle of grooming without leaving your domain. Kral Salon brings the exclusive barbering experience directly to your door.",
+    ar: "استمتع بقمة العناية دون مغادرة مكانك. يقدم صالون كرال تجربة الحلاقة الحصرية مباشرة إلى باب منزلك.",
+  },
+  step1Title: { en: "I. Secure the Slot", ar: "أولاً: احجز موعدك" },
+  step1Desc: {
+    en: "Select your preferred time and barber. Let us know your location in Alexandria.",
+    ar: "اختر الوقت المفضل لديك والحلاق. أخبرنا بموقعك في الإسكندرية.",
+  },
+  step2Title: { en: "II. The Arrival", ar: "ثانياً: الوصول" },
+  step2Desc: {
+    en: "Our master barber arrives with our premium mobile setup, respecting your privacy.",
+    ar: "يصل حلاقنا الماهر مع تجهيزاتنا المتنقلة الفاخرة، مع احترام خصوصيتك.",
+  },
+  step3Title: { en: "III. The Transformation", ar: "ثالثاً: التحول" },
+  step3Desc: {
+    en: "Enjoy a flawless cut, hot towel shave, and grooming in your own sanctuary.",
+    ar: "استمتع بقصة شعر مثالية، وحلاقة بالمنشفة الساخنة، والعناية في ملاذك الخاص.",
+  },
+  bookHomeService: { en: "Book Home Service", ar: "احجز خدمة منزلية" },
   premiumServiceTitle: { en: "The Sovereign Mobile Experience", ar: "تجربة السيادة المتنقلة" },
   premiumServiceBio: {
     en: "Exclusivity delivered to your doorstep. We bring the full industrial sanctuary setup to your home or office. Experience the pinnacle of grooming without the commute.",

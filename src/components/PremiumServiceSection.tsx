@@ -35,25 +35,25 @@ export default function PremiumServiceSection({ onBookPremium }: PremiumServiceS
             <Crown className="w-10 h-10 md:w-12 md:h-12 text-[#D4AF37] mb-6 transition-colors duration-500" />
             
             <h3 className="font-heading text-2xl md:text-4xl text-foreground mb-4 leading-tight">
-              The Mobile Sanctuary
+              {t("mobileSanctuary")}
             </h3>
             
             <p className="text-muted-foreground font-body text-base md:text-lg mb-8 max-w-2xl leading-relaxed">
-              Experience the pinnacle of grooming without leaving your domain. Kral Salon brings the exclusive barbering experience directly to your door.
+              {t("mobileSanctuaryDesc")}
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full mb-10">
               <div className="bg-surface/50 p-6 rounded border border-white/5 hover:border-[#D4AF37]/50 transition-colors">
-                <span className="text-[#D4AF37] font-heading text-xl mb-2 block">I. Secure the Slot</span>
-                <p className="text-sm text-muted-foreground">Select your preferred time and barber. Let us know your location in Alexandria.</p>
+                <span className="text-[#D4AF37] font-heading text-xl mb-2 block">{t("step1Title")}</span>
+                <p className="text-sm text-muted-foreground">{t("step1Desc")}</p>
               </div>
               <div className="bg-surface/50 p-6 rounded border border-white/5 hover:border-[#D4AF37]/50 transition-colors">
-                <span className="text-[#D4AF37] font-heading text-xl mb-2 block">II. The Arrival</span>
-                <p className="text-sm text-muted-foreground">Our master barber arrives with our premium mobile setup, respecting your privacy.</p>
+                <span className="text-[#D4AF37] font-heading text-xl mb-2 block">{t("step2Title")}</span>
+                <p className="text-sm text-muted-foreground">{t("step2Desc")}</p>
               </div>
               <div className="bg-surface/50 p-6 rounded border border-white/5 hover:border-[#D4AF37]/50 transition-colors">
-                <span className="text-[#D4AF37] font-heading text-xl mb-2 block">III. The Transformation</span>
-                <p className="text-sm text-muted-foreground">Enjoy a flawless cut, hot towel shave, and grooming in your own sanctuary.</p>
+                <span className="text-[#D4AF37] font-heading text-xl mb-2 block">{t("step3Title")}</span>
+                <p className="text-sm text-muted-foreground">{t("step3Desc")}</p>
               </div>
             </div>
             
@@ -62,7 +62,7 @@ export default function PremiumServiceSection({ onBookPremium }: PremiumServiceS
                 onClick={onBookPremium}
                 className="px-6 py-3 md:px-8 md:py-3 bg-surface border border-[#D4AF37] text-[#D4AF37] font-label uppercase tracking-widest transition-all hover:bg-[#D4AF37]/10 rounded-sm text-sm md:text-base whitespace-nowrap shadow-[0_0_15px_rgba(212,175,55,0.2)]"
               >
-                Book Home Service
+                {t("bookHomeService")}
               </button>
             )}
           </div>

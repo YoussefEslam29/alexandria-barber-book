@@ -2,15 +2,19 @@ import { MapPin, Phone, Clock, Instagram, Facebook } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
 
 export default function AboutSection() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
 
   return (
     <section id="about" className="py-32 px-4 bg-surface-container-low border-t border-surface-container">
       <div className="container mx-auto max-w-6xl">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <div>
-            <p className="text-primary font-label text-sm tracking-[0.3em] uppercase mb-4">We are waiting for you </p>
-            <h2 className="font-heading text-4xl md:text-5xl text-foreground mb-8 tracking-tight">An <span className="italic text-primary">Exclusive</span> Experience</h2>
+            <p className="text-primary font-label text-sm tracking-[0.3em] uppercase mb-4">{t("waitingForYou")}</p>
+            <h2 className="font-heading text-4xl md:text-5xl text-foreground mb-8 tracking-tight">
+              {lang === "ar" ? "تجربة " : "An "}
+              <span className="italic text-primary">{t("exclusive")}</span>
+              {lang === "ar" ? "" : " Experience"}
+            </h2>
             <p className="text-muted-foreground font-body text-lg leading-relaxed mb-10">
               {t("aboutDescription")}
             </p>

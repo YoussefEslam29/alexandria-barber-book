@@ -48,7 +48,9 @@ export default function BarbersSection({ onBookWithBarber }: BarbersSectionProps
         <div className="mb-16">
           <p className="text-primary font-label text-sm tracking-[0.3em] uppercase mb-3">{t("meetTheTeam")}</p>
           <h2 className="font-heading text-4xl md:text-5xl text-foreground tracking-tight">
-            The <span className="text-primary italic">Barbers</span>
+            {lang === "ar" ? t("barbers") : (
+              <>The <span className="text-primary italic">Barbers</span></>
+            )}
           </h2>
         </div>
 

@@ -71,7 +71,7 @@ async function getGallery(): Promise<GalleryItem[]> {
 }
 
 export default function MasterpieceSection() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const { data: gallery = FALLBACK_GALLERY } = useQuery({
     queryKey: ["gallery"],
     queryFn: getGallery,
@@ -84,7 +84,9 @@ export default function MasterpieceSection() {
           <div>
             <p className="text-primary font-label text-sm tracking-[0.3em] uppercase mb-3">{t("recentWork")}</p>
             <h2 className="font-heading text-4xl md:text-5xl text-foreground tracking-tight">
-              Master<span className="text-primary italic">piece</span>
+              {lang === "ar" ? t("masterpiece") : (
+                <>Master<span className="text-primary italic">piece</span></>
+              )}
             </h2>
           </div>
           <a
