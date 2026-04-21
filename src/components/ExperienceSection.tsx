@@ -4,6 +4,7 @@ import video2 from "@/assets/kral salon video 2.mp4";
 import video3 from "@/assets/kral salon video 3.mp4";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { TranslationKey } from "@/i18n/translations";
+import { motion } from "framer-motion";
 
 const FEATURES: { icon: any; titleKey: TranslationKey; descKey: TranslationKey }[] = [
   {
@@ -48,6 +49,25 @@ const STEPS: { number: string; titleKey: TranslationKey; descKey: TranslationKey
 
 const videos = [video1, video2, video3];
 
+const customEase = [0.16, 1, 0.3, 1];
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1 },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: customEase },
+  },
+};
+
 export default function ExperienceSection() {
   const { t, lang } = useLanguage();
 
@@ -65,10 +85,18 @@ export default function ExperienceSection() {
         </p>
 
         {/* ── Video Grid ── */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-32" dir="ltr">
+        <motion.div 
+          className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-32" 
+          dir="ltr"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+        >
           {videos.map((src, i) => (
-            <div
+            <motion.div
               key={i}
+              variants={itemVariants}
               className="relative rounded-2xl overflow-hidden shadow-[0_0_24px_rgba(0,219,231,0.15)] group"
             >
               <video
@@ -81,15 +109,23 @@ export default function ExperienceSection() {
               />
               {/* Subtle vignette overlay */}
               <div className="absolute inset-0 rounded-2xl pointer-events-none bg-gradient-to-t from-surface/40 via-transparent to-transparent" />
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
         {/* ── Feature Grid ── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-32" dir="ltr">
+        <motion.div 
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-32" 
+          dir="ltr"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+        >
           {FEATURES.map((f) => (
-            <div
+            <motion.div
               key={f.titleKey}
+              variants={itemVariants}
               className="rounded-xl p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_20px_rgba(0,219,231,0.1)] flex flex-col"
               style={{
                 backgroundColor: "#0f0f0f",
@@ -104,9 +140,9 @@ export default function ExperienceSection() {
               <p className="text-muted-foreground font-body text-sm leading-relaxed">
                 {t(f.descKey)}
               </p>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
         {/* ── Effortless Booking ── */}
         <div>
@@ -120,10 +156,18 @@ export default function ExperienceSection() {
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6" dir="ltr">
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-3 gap-6" 
+            dir="ltr"
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+          >
             {STEPS.map((s) => (
-              <div
+              <motion.div
                 key={s.number}
+                variants={itemVariants}
                 className={`rounded-xl p-8 text-center ${lang === "ar" ? "md:text-right" : "md:text-left"} transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_0_20px_rgba(0,219,231,0.1)] group`}
                 style={{
                   backgroundColor: "#0f0f0f",
@@ -140,9 +184,9 @@ export default function ExperienceSection() {
                 <p className="text-muted-foreground font-body text-sm leading-relaxed">
                   {t(s.descKey)}
                 </p>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>

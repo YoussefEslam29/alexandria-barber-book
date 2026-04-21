@@ -2,6 +2,28 @@ import { useQuery } from "@tanstack/react-query";
 import { getServices } from "@/lib/supabase-helpers";
 import { Clock, Scissors } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { motion } from "framer-motion";
+
+const customEase = [0.16, 1, 0.3, 1];
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: customEase },
+  },
+};
 
 export default function ServicesSection() {
   const { lang, t } = useLanguage();
@@ -40,9 +62,23 @@ export default function ServicesSection() {
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <motion.div 
+            className="grid grid-cols-1 lg:grid-cols-2 gap-8"
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+          >
             {services?.map((service) => (
-              <div key={service.id} className="bg-surface-container-low ghost-border rounded-md p-8 hover:bg-surface-container-highest transition-all group flex flex-col justify-between items-start relative overflow-hidden">
+              <motion.div 
+                key={service.id} 
+                variants={itemVariants}
+                whileHover={{
+                  borderColor: "rgba(0,219,231,1)",
+                  boxShadow: "0 0 20px rgba(0,219,231,0.5)",
+                }}
+                className="bg-surface-container-low border border-surface-container-high rounded-md p-8 transition-colors group flex flex-col justify-between items-start relative overflow-hidden"
+              >
                 <div className="absolute top-0 left-0 w-1 h-full bg-primary transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
                 <div className="flex items-start justify-between w-full mb-4">
                   <h3 className="font-heading text-2xl text-foreground">
@@ -58,9 +94,9 @@ export default function ServicesSection() {
                   <Clock className="h-4 w-4" />
                   <span>{service.duration_minutes} {t("min")}</span>
                 </div>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         )}
       </div>
     </section>

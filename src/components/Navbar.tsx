@@ -33,10 +33,21 @@ export default function Navbar({ onBookClick, onMyBookingsClick, isBarber }: Nav
 
         {/* Desktop — centered links */}
         <div className="hidden md:flex flex-1 items-center justify-center gap-8">
-          <a href="#services" className="text-muted-foreground hover:text-primary transition-colors text-sm font-label tracking-wide">{t("services")}</a>
-          <a href="#barbers" className="text-muted-foreground hover:text-primary transition-colors text-sm font-label tracking-wide">{t("barbers")}</a>
-          <a href="#masterpiece" className="text-muted-foreground hover:text-primary transition-colors text-sm font-label tracking-wide">{t("masterpiece")}</a>
-          <a href="#about" className="text-muted-foreground hover:text-primary transition-colors text-sm font-label tracking-wide">{t("about")}</a>
+          {[
+            { id: "services", label: t("services") },
+            { id: "barbers", label: t("barbers") },
+            { id: "masterpiece", label: t("masterpiece") },
+            { id: "about", label: t("about") },
+          ].map((link) => (
+            <a 
+              key={link.id}
+              href={`#${link.id}`} 
+              className="relative group text-muted-foreground hover:text-primary transition-colors text-sm font-label tracking-wide"
+            >
+              {link.label}
+              <span className="absolute -bottom-1 left-1/2 w-0 h-[2px] bg-primary -translate-x-1/2 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:w-full group-hover:shadow-[0_0_8px_rgba(0,219,231,0.8)]"></span>
+            </a>
+          ))}
         </div>
 
         {/* Desktop — right side */}
