@@ -58,3 +58,8 @@ To prevent overwhelming the user with a massive form, the booking flow is split 
 - **Interaction Design:** Added 'Magnetic' CTA buttons and liquid-glow hover states for Premium Gold services.
 - **Performance:** Optimized scroll-reveal staggering using `whileInView` viewport triggers.
 - **Easing Profile:** Standardized on 'Industrial Heavy' cubic-bezier curves (0.16, 1, 0.3, 1).
+
+## 🔧 Infrastructure Note (April 22, 2026)
+- **Issue:** MCP Server "Unauthorized" during initialization.
+- **Root Cause:** Expired session/API key handshake mismatch.
+- **Fix:** Refreshed `service_role` keys in Antigravity Secrets and restarted the MCP server process.
