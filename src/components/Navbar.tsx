@@ -57,9 +57,9 @@ export default function Navbar({ onBookClick, onMyBookingsClick, isBarber }: Nav
               {t("adminDashboard")}
             </button>
           )}
-          <button onClick={onMyBookingsClick} className="text-muted-foreground hover:text-primary transition-colors text-sm font-label">
+          {/* <button onClick={onMyBookingsClick} className="text-muted-foreground hover:text-primary transition-colors text-sm font-label">
             {t("trackMyBooking")}
-          </button>
+          </button> */}
           <Button
             onClick={onBookClick}
             size="sm"
@@ -96,9 +96,9 @@ export default function Navbar({ onBookClick, onMyBookingsClick, isBarber }: Nav
               {t("adminDashboard")}
             </button>
           )}
-          <button onClick={() => { onMyBookingsClick(); setOpen(false); }} className="block text-muted-foreground hover:text-primary font-label text-sm w-full text-start">
+          {/* <button onClick={() => { onMyBookingsClick(); setOpen(false); }} className="block text-muted-foreground hover:text-primary font-label text-sm w-full text-start">
             {t("trackMyBooking")}
-          </button>
+          </button> */}
           <Button
             onClick={() => { onBookClick(); setOpen(false); }}
             size="sm"
