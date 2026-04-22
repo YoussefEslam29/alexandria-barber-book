@@ -2,7 +2,7 @@ import { MessageCircle } from "lucide-react";
 
 const WA_NUMBER = "201030355625";
 const WA_MESSAGE = encodeURIComponent(
-  "Hello Kral Salon! I just submitted a booking request and would like to confirm my appointment. Please let me know the next steps. Thank you! 🙏"
+  "Hello Kral Salon, I would like to inquire about a grooming appointment."
 );
 
 export default function WhatsAppButton() {
