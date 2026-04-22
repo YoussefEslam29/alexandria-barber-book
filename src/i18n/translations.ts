@@ -8,8 +8,8 @@ export const translations = {
   about: { en: "About", ar: "من نحن" },
   myBookings: { en: "My Bookings", ar: "حجوزاتي" },
   adminDashboard: { en: "Admin Dashboard", ar: "لوحة التحكم" },
-  bookNow: { en: "Book Now", ar: "احجز الآن" },
-  bookWithMe: { en: "Book with me", ar: "احجز معي" },
+  bookNow: { en: "Book via WhatsApp", ar: "احجز عبر واتساب" },
+  bookWithMe: { en: "Book via WhatsApp", ar: "احجز عبر واتساب" },
   meetTheTeam: { en: "Meet the Team", ar: "تعرف على الفريق" },
   recentWork: { en: "Recent Work", ar: "أعمالنا الأخيرة" },
   viewMoreOnInstagram: { en: "View more on Instagram", ar: "المزيد على إنستغرام" },
@@ -19,10 +19,10 @@ export const translations = {
   // Hero
   heroSubtitle: { en: "Alexandria, Egypt", ar: "الإسكندرية، مصر" },
   heroDescription: {
-    en: "Premium grooming experience in Alexandria. Classic cuts, modern style.",
-    ar: "تجربة حلاقة فاخرة في الإسكندرية. قصات كلاسيكية، أسلوب عصري.",
+    en: "Experience the pinnacle of grooming. Contact us directly on WhatsApp to secure your slot or inquire about our Sovereign Home Services.",
+    ar: "جرب قمة العناية. تواصل معنا مباشرة عبر واتساب لحجز موعدك أو للاستفسار عن خدمات السيادة المنزلية.",
   },
-  bookAppointment: { en: "Book Your Appointment", ar: "احجز موعدك" },
+  bookAppointment: { en: "Contact via WhatsApp", ar: "تواصل عبر واتساب" },
 
   // Barbers
   chooseBarber: { en: "Choose a Barber (optional)", ar: "اختر حلاق (اختياري)" },
@@ -170,7 +170,7 @@ export const translations = {
     en: "Enjoy a flawless cut, hot towel shave, and grooming in your own sanctuary.",
     ar: "استمتع بقصة شعر مثالية، وحلاقة بالمنشفة الساخنة، والعناية في ملاذك الخاص.",
   },
-  bookHomeService: { en: "Book Home Service", ar: "احجز خدمة منزلية" },
+  bookHomeService: { en: "Book via WhatsApp", ar: "احجز عبر واتساب" },
   premiumServiceTitle: { en: "The Sovereign Mobile Experience", ar: "تجربة السيادة المتنقلة" },
   premiumServiceBio: {
     en: "Exclusivity delivered to your doorstep. We bring the full industrial sanctuary setup to your home or office. Experience the pinnacle of grooming without the commute.",
