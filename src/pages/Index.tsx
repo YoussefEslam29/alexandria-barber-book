@@ -29,9 +29,8 @@ export default function Index() {
   const [isHomeService, setIsHomeService] = useState(false);
 
   const handleBookClick = (barberName?: string, homeService = false) => {
-    setSelectedBarber(barberName);
-    setIsHomeService(homeService);
-    setBookOpen(true);
+    const message = encodeURIComponent("Hello Kral Salon, I would like to inquire about a grooming appointment.");
+    window.open(`https://wa.me/201030355625?text=${message}`, '_blank');
   };
 
   const handleBookWithBarber = (barberName: string) => {
